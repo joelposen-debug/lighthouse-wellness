@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lighthouse Wellness — Startup Checklist</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBGKATmz498tN0MDeLrxlHyZZicwlSsIss",
+    authDomain: "lighthouse-wellness.firebaseapp.com",
+    projectId: "lighthouse-wellness",
+    storageBucket: "lighthouse-wellness.firebasestorage.app",
+    messagingSenderId: "881699073306",
+    appId: "1:881699073306:web:030e70fe306596ae2010a3"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  window._db = db;
+  window._doc = doc;
+  window._getDoc = getDoc;
+  window._setDoc = setDoc;
+  window._onSnapshot = onSnapshot;
+  window._storage = storage;
+  window._ref = ref;
+  window._uploadBytesResumable = uploadBytesResumable;
+  window._getDownloadURL = getDownloadURL;
+  window._firebaseReady = true;
+  window.dispatchEvent(new Event("firebaseReady"));
+</script>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: #f4f6f8; min-height: 100vh; }
+
+/* Name screen */
+.name-screen { min-height: 100vh; background: #0f2340; display: flex; align-items: center; justify-content: center; }
+.name-card { background: #fff; border-radius: 20px; padding: 48px 40px; max-width: 400px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.name-card .logo { font-size: 52px; margin-bottom: 12px; }
+.name-card h1 { font-family: 'DM Serif Display', serif; font-size: 26px; color: #0f2340; font-weight: normal; margin-bottom: 8px; }
+.name-card p { font-size: 14px; color: #7a8c9e; margin-bottom: 28px; }
+.name-card input { width: 100%; padding: 12px 16px; border: 2px solid #dce4ec; border-radius: 10px; font-size: 15px; outline: none; margin-bottom: 14px; font-family: inherit; }
+.name-card input:focus { border-color: #1a7a6e; }
+.name-card button { width: 100%; padding: 13px; background: #0f2340; color: #fff; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; font-family: inherit; transition: opacity 0.2s; }
+.name-card button:disabled { opacity: 0.4; }
+
+/* Header */
+.header { background: #0f2340; padding: 24px 32px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
+.header h1 { font-family: 'DM Serif Display', serif; font-size: 24px; color: #fff; font-weight: normal; margin-bottom: 4px; }
+.header-sub { color: #8aaac8; font-size: 13px; margin-bottom: 16px; }
+.progress-wrap { display: flex; align-items: center; gap: 12px; }
+.progress-bg { width: 220px; height: 6px; background: rgba(255,255,255,0.15); border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; background: #c9973a; border-radius: 99px; transition: width 0.4s; }
+.progress-label { color: #c9973a; font-size: 13px; font-weight: 600; }
+.header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.user-badge { background: rgba(255,255,255,0.1); color: #fff; padding: 6px 14px; border-radius: 99px; font-size: 13px; }
+.sync-status { color: #8aaac8; font-size: 11px; min-height: 16px; }
+.header-btns { display: flex; gap: 8px; }
+.header-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #8aaac8; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-family: inherit; }
+.header-btn:hover { background: rgba(255,255,255,0.05); }
+
+/* Sync banner */
+.sync-banner { background: #1a7a6e; color: #fff; padding: 10px 32px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.sync-banner.error { background: #c0392b; }
+.sync-banner.connecting { background: #c9973a; }
+
+/* Phases */
+.phases { max-width: 760px; margin: 28px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
+.phase { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.phase-header { padding: 16px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #eef1f4; user-select: none; }
+.phase-header:hover { background: #fafbfc; }
+.phase-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.phase-title-wrap { flex: 1; }
+.phase-title { font-size: 15px; font-weight: 600; color: #0f2340; }
+.phase-sub { font-size: 12px; color: #7a8c9e; }
+.phase-count { font-size: 12px; font-weight: 600; color: #7a8c9e; background: #f4f6f8; padding: 3px 10px; border-radius: 99px; }
+.chevron { color: #7a8c9e; font-size: 16px; transition: transform 0.2s; }
+.collapsed .chevron { transform: rotate(-90deg); }
+
+/* Items */
+.item { border-bottom: 1px solid #f0f3f6; transition: background 0.15s; }
+.item.done { background: #f0faf8; }
+.item-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 20px; }
+.checkbox { width: 22px; height: 22px; border: 2px solid #dce4ec; border-radius: 6px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; background: #fff; }
+.checkbox.checked { background: #1a7a6e; border-color: #1a7a6e; }
+.checkmark { color: #fff; font-size: 13px; font-weight: bold; }
+.item-body { flex: 1; }
+.item-text { font-size: 14px; line-height: 1.5; color: #1e2d3d; }
+.item.done .item-text { color: #a0b8b4; text-decoration: line-through; }
+.checked-by { font-size: 11px; color: #1a7a6e; margin-top: 3px; }
+.item-btns { display: flex; gap: 6px; flex-shrink: 0; }
+.pill-btn { border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer; font-size: 12px; background: #f4f6f8; color: #7a8c9e; font-family: inherit; transition: all 0.15s; }
+.pill-btn.active-notes { background: #e8f5f3; color: #1a7a6e; }
+.pill-btn.active-docs { background: #fff8e8; color: #c9973a; }
+.pill-btn.has-notes { color: #1a7a6e; }
+.pill-btn.has-docs { color: #c9973a; }
+
+/* Notes */
+.notes-section { padding: 0 20px 16px 54px; border-top: 1px dashed #eef1f4; }
+.no-content { font-size: 12px; color: #7a8c9e; padding: 10px 0 8px; font-style: italic; }
+.note-item { margin-bottom: 10px; padding-top: 10px; border-top: 1px solid #f4f6f8; }
+.note-author { font-size: 12px; font-weight: 600; color: #0f2340; }
+.note-time { font-weight: normal; color: #7a8c9e; }
+.note-text { font-size: 13px; color: #3a4a5c; margin-top: 3px; line-height: 1.5; }
+.input-row { display: flex; gap: 8px; margin-top: 10px; }
+.text-input { flex: 1; padding: 8px 12px; border: 1px solid #dce4ec; border-radius: 8px; font-size: 13px; outline: none; font-family: inherit; }
+.text-input:focus { border-color: #1a7a6e; }
+.submit-btn { padding: 8px 16px; background: #1a7a6e; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit; }
+.submit-btn:hover { opacity: 0.9; }
+
+/* Docs */
+.docs-section { padding: 12px 20px 16px 54px; border-top: 1px dashed #fff0d0; background: #fffdf5; }
+.docs-title { font-size: 12px; font-weight: 600; color: #c9973a; margin-bottom: 10px; }
+.doc-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 7px 10px; background: #fff; border-radius: 8px; border: 1px solid #f0e0c0; }
+.doc-link { flex: 1; color: #0f2340; font-size: 13px; text-decoration: none; font-weight: 500; }
+.doc-link:hover { color: #1a7a6e; }
+.doc-meta { font-size: 11px; color: #7a8c9e; white-space: nowrap; }
+.doc-remove { background: none; border: none; color: #ccc; cursor: pointer; font-size: 14px; padding: 0 2px; }
+.doc-remove:hover { color: #e74c3c; }
+.doc-inputs { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.attach-btn { padding: 8px 16px; background: #c9973a; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; align-self: flex-start; font-family: inherit; }
+.attach-btn:hover { opacity: 0.9; }
+
+/* Add item */
+.add-item-wrap { padding: 10px 20px 14px; }
+.add-item-row { display: flex; gap: 8px; }
+.add-item-btn { background: none; border: 1px dashed #dce4ec; color: #7a8c9e; padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; width: 100%; text-align: left; font-family: inherit; }
+.add-item-btn:hover { border-color: #1a7a6e; color: #1a7a6e; }
+.save-btn { padding: 8px 16px; background: #0f2340; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit; }
+.cancel-btn { padding: 8px 12px; background: #f4f6f8; color: #7a8c9e; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit; }
+
+.footer { text-align: center; font-size: 12px; color: #7a8c9e; margin-top: 24px; padding: 0 16px 40px; }
+
+/* Loading */
+.loading-screen { min-height: 100vh; background: #0f2340; display: flex; align-items: center; justify-content: center; color: #8aaac8; font-size: 16px; gap: 12px; }
+
+/* Activity history */
+.history-section { padding: 0 20px 16px 54px; border-top: 1px dashed #eef1f4; background: #fafbfc; }
+.history-title { font-size: 12px; font-weight: 600; color: #7a8c9e; margin-bottom: 8px; padding-top: 12px; }
+.history-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #f0f3f6; font-size: 12px; color: #5a6a7e; }
+.history-item:last-child { border-bottom: none; }
+.history-icon { font-size: 14px; flex-shrink: 0; }
+.history-time { color: #a0b0c0; font-size: 11px; margin-left: auto; white-space: nowrap; }
+
+/* File upload */
+.upload-section { padding: 12px 20px 16px 54px; border-top: 1px dashed #d0e8ff; background: #f5f9ff; }
+.upload-title { font-size: 12px; font-weight: 600; color: #3a7bd5; margin-bottom: 10px; }
+.upload-drop { border: 2px dashed #b0cef0; border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; background: #fff; transition: all 0.2s; }
+.upload-drop:hover { border-color: #3a7bd5; background: #eef5ff; }
+.upload-drop input { display: none; }
+.upload-drop-text { font-size: 13px; color: #7a8c9e; }
+.upload-drop-text strong { color: #3a7bd5; }
+.upload-file-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 8px 10px; background: #fff; border-radius: 8px; border: 1px solid #d0e0f0; }
+.upload-file-link { flex: 1; color: #0f2340; font-size: 13px; text-decoration: none; font-weight: 500; }
+.upload-file-link:hover { color: #3a7bd5; }
+.upload-file-meta { font-size: 11px; color: #7a8c9e; white-space: nowrap; }
+.upload-progress { height: 4px; background: #e0eaf5; border-radius: 99px; overflow: hidden; margin-top: 8px; }
+.upload-progress-fill { height: 100%; background: #3a7bd5; border-radius: 99px; transition: width 0.3s; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="loading-screen">⟳ Connecting to Firebase...</div>
+</div>
+
+<script type="module">
+const INITIAL_PHASES = [
+  { id:"phase-1", title:"Phase 1 — Business Foundation", subtitle:"Legal entity, tax ID, banking", icon:"🏢", color:"#eef3ff",
+    items:[
+      {id:"p1-1", text:"Register business entity (LLC or Corp) in New York State"},
+      {id:"p1-2", text:"Obtain EIN (Tax ID) from the IRS"},
+      {id:"p1-3", text:"Open a business bank account for Lighthouse Wellness"},
+      {id:"p1-4", text:"Secure a company domain name (e.g., lighthousewellness.com)"},
+    ]},
+  { id:"phase-2", title:"Phase 2 — Medicaid & State Portal Access", subtitle:"ePACES, HCS, NY Medicaid portals", icon:"🏥", color:"#e8f5f3",
+    items:[
+      {id:"p2-1", text:"Get a Medicaid Provider ID"},
+      {id:"p2-2", text:"Register with ePACES (NY Medicaid eligibility & claims portal)"},
+      {id:"p2-3", text:"Register with HCS (Health Commerce System)"},
+      {id:"p2-4", text:"Research and register with all other required NY State Medicaid/health portals"},
+      {id:"p2-5", text:"Ensure Medicaid billing and credentialing is fully set up"},
+    ]},
+  { id:"phase-3", title:"Phase 3 — Communications & Technology", subtitle:"Email, website, document storage", icon:"💻", color:"#fff4e8",
+    items:[
+      {id:"p3-1", text:"Set up company email accounts using the domain"},
+      {id:"p3-2", text:"Build a simple website for storing training materials"},
+      {id:"p3-3", text:"Set up a shared folder/drive for all corporate documents"},
+      {id:"p3-4", text:"Get phone provider for the company"},
+    ]},
+  { id:"phase-4", title:"Phase 4 — HR & Payroll", subtitle:"Friday, Indeed, hiring", icon:"👥", color:"#f0faf8",
+    items:[
+      {id:"p4-1", text:"Complete Friday payroll setup"},
+      {id:"p4-2", text:"Create an Indeed account to recruit case managers"},
+      {id:"p4-3", text:"Draft job descriptions for case managers"},
+      {id:"p4-4", text:"Develop onboarding process for new hires"},
+    ]},
+  { id:"phase-5", title:"Phase 5 — Policies, Procedures & Compliance", subtitle:"Documents, training materials", icon:"📋", color:"#fdf0f8",
+    items:[
+      {id:"p5-1", text:"Create and organize Policies & Procedures documents"},
+      {id:"p5-2", text:"Set up document management system (Google Drive / DocuSign / Notion)"},
+      {id:"p5-3", text:"Gather and organize all training materials"},
+    ]},
+  { id:"phase-6", title:"Phase 6 — Office Setup", subtitle:"Physical space, equipment", icon:"🏠", color:"#f5f0ff",
+    items:[
+      {id:"p6-1", text:"Secure and set up a physical office location"},
+      {id:"p6-2", text:"Set up office equipment, internet, and phone systems"},
+    ]},
+];
+
+function genId() { return "i-" + Math.random().toString(36).substr(2,9); }
+function fmt(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US",{month:"short",day:"numeric"}) + " at " + d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+}
+
+// ── State ──
+let userName = localStorage.getItem("lw_username") || "";
+let state = { phases: INITIAL_PHASES, checks: {}, notes: {}, docs: {}, activity: {}, uploads: {} };
+let collapsed = {};
+let expandedNotes = {};
+let expandedDocs = {};
+let addingItem = {};
+let noteInputs = {};
+let docInputs = {};
+let newItemTexts = {};
+let syncStatus = "connecting";
+let unsubscribe = null;
+let addingPhase = false;
+let newPhaseText = "";
+let editingPhase = {};
+let editPhaseText = {};
+let expandedHistory = {};
+let expandedUploads = {};
+let uploadProgress = {};
+let showRestorePanel = false;
+let snapshots = [];
+let lastChangeAt = null;
+let lastSnapshotAt = null;
+
+// Auto-save a version every 10 min if something changed
+setInterval(async () => {
+  if (lastChangeAt && (!lastSnapshotAt || lastChangeAt > lastSnapshotAt)) {
+    await saveSnapshot(`Auto-save — ${new Date().toLocaleString()}`);
+    lastSnapshotAt = Date.now();
+  }
+}, 10 * 60 * 1000);
+
+async function saveSnapshot(label) {
+  const snap = {
+    id: Date.now(),
+    label: label || `Saved by ${userName} — ${new Date().toLocaleString()}`,
+    by: userName,
+    at: new Date().toISOString(),
+    state: JSON.parse(JSON.stringify(state))
+  };
+  const newSnapshots = [snap, ...snapshots].slice(0, 15);
+  try {
+    await window._setDoc(window._doc(window._db, "checklist", "snapshots"), { list: newSnapshots });
+    snapshots = newSnapshots;
+  } catch(e) { console.error("Snapshot save error:", e); }
+}
+
+async function restoreSnapshot(snapId) {
+  const snap = snapshots.find(s => s.id === snapId);
+  if (!snap) return;
+  if (!confirm(`Restore to "${snap.label}"?\n\nThis will overwrite current data for everyone. A backup will be saved first.`)) return;
+  await saveSnapshot(`Auto-backup before restore by ${userName}`);
+  await saveToFirebase(snap.state);
+  showRestorePanel = false;
+  render();
+}
+
+function subscribeToSnapshots() {
+  const ref = window._doc(window._db, "checklist", "snapshots");
+  window._onSnapshot(ref, (snap) => {
+    if (snap.exists()) {
+      snapshots = snap.data().list || [];
+      if (showRestorePanel) render();
+    }
+  });
+}
+
+// ── Firebase helpers ──
+async function saveToFirebase(data) {
+  try {
+    await window._setDoc(window._doc(window._db, "checklist", "main"), data);
+    syncStatus = "saved";
+    render();
+  } catch(e) {
+    console.error("Save error:", e);
+    syncStatus = "error";
+    render();
+  }
+}
+
+function subscribeToFirebase() {
+  if (unsubscribe) unsubscribe();
+  const ref = window._doc(window._db, "checklist", "main");
+  unsubscribe = window._onSnapshot(ref, (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      state = {
+        phases: data.phases || INITIAL_PHASES,
+        checks: data.checks || {},
+        notes: data.notes || {},
+        docs: data.docs || {},
+        activity: data.activity || {},
+        uploads: data.uploads || {},
+      };
+    } else {
+      // First time — save initial data
+      saveToFirebase(state);
+    }
+    syncStatus = "live";
+    render();
+  }, (err) => {
+    console.error("Snapshot error:", err);
+    syncStatus = "error";
+    render();
+  });
+}
+
+function updateState(updates) {
+  state = { ...state, ...updates };
+  lastChangeAt = Date.now();
+  saveToFirebase(state);
+  render();
+}
+
+// ── Render ──
+function render() {
+  const app = document.getElementById("app");
+
+  if (!userName) {
+    app.innerHTML = `
+      <div class="name-screen">
+        <div class="name-card">
+          <div class="logo">🏠</div>
+          <h1>Lighthouse Wellness</h1>
+          <p>Enter your name to collaborate with your team</p>
+          <input id="nameInput" type="text" placeholder="Your name..." autocomplete="off" />
+          <button id="nameBtn" disabled>Enter Checklist →</button>
+        </div>
+      </div>`;
+    const input = document.getElementById("nameInput");
+    const btn = document.getElementById("nameBtn");
+    input.addEventListener("input", () => { btn.disabled = !input.value.trim(); });
+    input.addEventListener("keydown", (e) => { if (e.key==="Enter" && input.value.trim()) submitName(input.value.trim()); });
+    btn.addEventListener("click", () => { if (input.value.trim()) submitName(input.value.trim()); });
+    input.focus();
+    return void 0;
+  }
+
+  const totalItems = state.phases.reduce((s,p) => s + p.items.length, 0);
+  const totalDone = Object.values(state.checks).filter(c => c.checked).length;
+  const pct = totalItems ? Math.round(totalDone/totalItems*100) : 0;
+
+  const syncLabel = syncStatus === "live" ? "🟢 Live — syncing with team"
+    : syncStatus === "saved" ? "✓ Saved"
+    : syncStatus === "connecting" ? "⟳ Connecting..."
+    : "⚠ Connection error — changes may not save";
+  const bannerClass = syncStatus === "error" ? "sync-banner error" : syncStatus === "connecting" ? "sync-banner connecting" : "sync-banner";
+
+  let phasesHTML = state.phases.map(phase => {
+    const phaseDone = phase.items.filter(i => state.checks[i.id]?.checked).length;
+    const isCollapsed = collapsed[phase.id];
+
+    const itemsHTML = phase.items.map(item => {
+      const check = state.checks[item.id];
+      const isDone = check?.checked;
+      const itemNotes = state.notes[item.id] || [];
+      const itemDocs = state.docs[item.id] || [];
+      const notesOpen = expandedNotes[item.id];
+      const docsOpen = expandedDocs[item.id];
+
+      const notesSection = notesOpen ? `
+        <div class="notes-section">
+          ${itemNotes.length===0 ? '<div class="no-content">No notes yet. Be the first!</div>' : ""}
+          ${itemNotes.map(n => `
+            <div class="note-item">
+              <div class="note-author">${n.author} <span class="note-time">· ${fmt(n.at)}</span></div>
+              <div class="note-text">${n.text.replace(/</g,"&lt;")}</div>
+            </div>`).join("")}
+          <div class="input-row">
+            <input class="text-input note-input" data-item="${item.id}" placeholder="Add a note as ${userName}..." value="${(noteInputs[item.id]||"").replace(/"/g,"&quot;")}" />
+            <button class="submit-btn post-note-btn" data-item="${item.id}">Post</button>
+          </div>
+        </div>` : "";
+
+      const docsSection = docsOpen ? `
+        <div class="docs-section">
+          <div class="docs-title">📎 Google Drive Documents</div>
+          ${itemDocs.length===0 ? '<div class="no-content">No documents attached yet.</div>' : ""}
+          ${itemDocs.map((doc,i) => `
+            <div class="doc-item">
+              <span>📄</span>
+              <a href="${doc.url}" target="_blank" rel="noopener noreferrer" class="doc-link">${doc.label.replace(/</g,"&lt;")}</a>
+              <span class="doc-meta">by ${doc.addedBy}</span>
+              <button class="doc-remove" data-item="${item.id}" data-idx="${i}">✕</button>
+            </div>`).join("")}
+          <div class="doc-inputs">
+            <input class="text-input doc-label-input" data-item="${item.id}" placeholder="Document name (optional)..." value="${(docInputs[item.id]?.label||"").replace(/"/g,"&quot;")}" />
+            <input class="text-input doc-url-input" data-item="${item.id}" placeholder="Paste Google Drive link..." value="${(docInputs[item.id]?.url||"").replace(/"/g,"&quot;")}" />
+            <button class="attach-btn attach-doc-btn" data-item="${item.id}">📎 Attach Document</button>
+          </div>
+        </div>` : "";
+
+      return `
+        <div class="item ${isDone?"done":""}" data-item-id="${item.id}">
+          <div class="item-row">
+            <div class="checkbox ${isDone?"checked":""} toggle-check" data-item="${item.id}">
+              ${isDone ? '<span class="checkmark">✓</span>' : ""}
+            </div>
+            <div class="item-body">
+              <div class="item-text">${item.text.replace(/</g,"&lt;")}</div>
+              ${isDone ? `<div class="checked-by">✓ Checked off by <strong>${check.by}</strong> · ${fmt(check.at)}</div>` : ""}
+            </div>
+            <div class="item-btns">
+              <button class="pill-btn toggle-notes-btn ${notesOpen?"active-notes":""} ${itemNotes.length?"has-notes":""}" data-item="${item.id}">
+                💬${itemNotes.length>0?" "+itemNotes.length:""}
+              </button>
+              <button class="pill-btn toggle-docs-btn ${docsOpen?"active-docs":""} ${itemDocs.length?"has-docs":""}" data-item="${item.id}">
+                📎${itemDocs.length>0?" "+itemDocs.length:""}
+              </button>
+              <button class="pill-btn toggle-uploads-btn ${expandedUploads[item.id]?"active-docs":""} ${(state.uploads[item.id]||[]).length?"has-docs":""}" data-item="${item.id}" title="Upload files">
+                📁${(state.uploads[item.id]||[]).length>0?" "+(state.uploads[item.id]||[]).length:""}
+              </button>
+              <button class="pill-btn toggle-history-btn ${expandedHistory[item.id]?"active-notes":""} ${(state.activity[item.id]||[]).length?"has-notes":""}" data-item="${item.id}" title="View history">
+                🕐${(state.activity[item.id]||[]).length>0?" "+(state.activity[item.id]||[]).length:""}
+              </button>
+            </div>
+          </div>
+          ${notesSection}
+          ${docsSection}
+          ${expandedUploads[item.id] ? `
+            <div class="upload-section">
+              <div class="upload-title">📁 File Uploads</div>
+              ${(state.uploads[item.id]||[]).map((f,i) => `
+                <div class="upload-file-item">
+                  <span>📄</span>
+                  <a href="${f.url}" target="_blank" rel="noopener noreferrer" class="upload-file-link">${f.name}</a>
+                  <span class="upload-file-meta">by ${f.uploadedBy} · ${fmt(f.at)}</span>
+                  <button class="doc-remove remove-upload-btn" data-item="${item.id}" data-idx="${i}">✕</button>
+                </div>`).join("")}
+              ${(state.uploads[item.id]||[]).length===0 ? '<div class="no-content">No files uploaded yet.</div>' : ""}
+              ${uploadProgress[item.id] !== undefined ? `
+                <div style="font-size:12px;color:#3a7bd5;margin:8px 0">Uploading... ${uploadProgress[item.id]}%</div>
+                <div class="upload-progress"><div class="upload-progress-fill" style="width:${uploadProgress[item.id]}%"></div></div>` : ""}
+              <label class="upload-drop" style="margin-top:10px;display:block">
+                <input type="file" class="file-upload-input" data-item="${item.id}" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.txt,.csv" />
+                <div class="upload-drop-text">📂 <strong>Click to upload</strong> or drag & drop<br><span style="font-size:11px">PDF, Word, Excel, Images supported</span></div>
+              </label>
+            </div>` : ""}
+          ${expandedHistory[item.id] ? `
+            <div class="history-section">
+              <div class="history-title">🕐 Activity History</div>
+              ${(state.activity[item.id]||[]).length===0 ? '<div class="no-content">No activity yet.</div>' : ""}
+              ${(state.activity[item.id]||[]).map(a => `
+                <div class="history-item">
+                  <span class="history-icon">${a.action==="checked"?"✅":"↩️"}</span>
+                  <span><strong>${a.by}</strong> ${a.action==="checked"?"checked this off":"unchecked this"}</span>
+                  <span class="history-time">${fmt(a.at)}</span>
+                </div>`).join("")}
+            </div>` : ""}
+        </div>`;
+    }).join("");
+
+    const addItemHTML = addingItem[phase.id] ? `
+      <div class="add-item-row">
+        <input class="text-input new-item-input" data-phase="${phase.id}" placeholder="New item..." value="${(newItemTexts[phase.id]||"").replace(/"/g,"&quot;")}" autocomplete="off" />
+        <button class="save-btn save-item-btn" data-phase="${phase.id}">Add</button>
+        <button class="cancel-btn cancel-item-btn" data-phase="${phase.id}">✕</button>
+      </div>` : `<button class="add-item-btn start-add-item" data-phase="${phase.id}">+ Add item</button>`;
+
+    return `
+      <div class="phase ${isCollapsed?"collapsed":""}" data-phase-id="${phase.id}">
+        <div class="phase-header-wrap">
+          <div class="phase-header toggle-phase" data-phase="${phase.id}">
+            <div class="phase-icon" style="background:${phase.color}">${phase.icon}</div>
+            <div class="phase-title-wrap">
+              ${editingPhase[phase.id] ? `
+                <input class="text-input edit-phase-input" data-phase="${phase.id}" value="${(editPhaseText[phase.id]||phase.title).replace(/"/g,"&quot;")}" style="font-size:14px;font-weight:600;" />
+              ` : `
+                <div class="phase-title">${phase.title}</div>
+                <div class="phase-sub">${phase.subtitle}</div>
+              `}
+            </div>
+            <div class="phase-count">${phaseDone}/${phase.items.length}</div>
+            <div class="phase-actions">
+              ${editingPhase[phase.id] ? `
+                <button class="pill-btn save-phase-btn" data-phase="${phase.id}" style="color:#1a7a6e">✓</button>
+                <button class="pill-btn cancel-edit-phase-btn" data-phase="${phase.id}">✕</button>
+              ` : `
+                <button class="pill-btn edit-phase-btn" data-phase="${phase.id}" title="Rename phase">✏️</button>
+                <button class="pill-btn delete-phase-btn" data-phase="${phase.id}" title="Delete phase" style="color:#e74c3c">🗑</button>
+              `}
+            </div>
+            <div class="chevron">▾</div>
+          </div>
+        </div>
+        ${!isCollapsed ? `<div>${itemsHTML}<div class="add-item-wrap">${addItemHTML}</div></div>` : ""}
+      </div>`;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="header">
+      <div>
+        <h1>Lighthouse Wellness</h1>
+        <div class="header-sub">Home Health Case Management · New York · Medicaid Services</div>
+        <div class="progress-wrap">
+          <div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div>
+          <span class="progress-label">${totalDone}/${totalItems} complete</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="user-badge">👤 ${userName}</div>
+        <div class="sync-status">${syncLabel}</div>
+        <div class="header-btns">
+          <button class="header-btn" id="switchUserBtn">Switch User</button>
+          <button class="header-btn" id="saveVersionBtn">💾 Save Version</button>
+          <button class="header-btn" id="restoreBtn">🕐 Restore</button>
+        </div>
+      </div>
+    </div>
+    <div class="${bannerClass}">
+      <span>🔴</span>
+      <span>${syncStatus==="live" ? "Live sync active — all team members see updates instantly." : syncStatus==="connecting" ? "Connecting to Firebase..." : "Connection error. Check your internet connection."}</span>
+    </div>
+
+    ${showRestorePanel ? `
+    <div style="background:#fff;border-bottom:2px solid #eef1f4;padding:20px 32px;">
+      <div style="max-width:760px;margin:0 auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="font-size:15px;font-weight:600;color:#0f2340;">🕐 Restore a Previous Version</div>
+          <button id="closeRestoreBtn" style="background:none;border:none;color:#7a8c9e;cursor:pointer;font-size:18px;">✕</button>
+        </div>
+        ${snapshots.length === 0 ? '<div style="font-size:13px;color:#7a8c9e;">No saved versions yet. Versions are saved automatically every time you make a change.</div>' : ""}
+        ${snapshots.map(s => `
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #eef1f4;border-radius:10px;margin-bottom:8px;background:#fafbfc;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;color:#0f2340;">${s.label}</div>
+              <div style="font-size:11px;color:#7a8c9e;">${fmt(s.at)}</div>
+            </div>
+            <button class="restore-snap-btn" data-id="${s.id}" style="padding:7px 14px;background:#0f2340;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;">Restore</button>
+          </div>`).join("")}
+        <div style="font-size:11px;color:#7a8c9e;margin-top:8px;">⚠ Restoring will overwrite current data. A backup is saved automatically before restoring.</div>
+      </div>
+    </div>` : ""}
+    <div class="phases">${phasesHTML}
+      <div style="padding:8px 0">
+        ${addingPhase ? `
+          <div class="add-item-row" style="background:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.05)">
+            <input class="text-input" id="newPhaseInput" placeholder="Phase name (e.g. Phase 7 — Marketing)..." value="${newPhaseText.replace(/"/g,"&quot;")}" style="font-size:14px" />
+            <button class="save-btn" id="savePhaseBtn">Add Phase</button>
+            <button class="cancel-btn" id="cancelPhaseBtn">✕</button>
+          </div>` : `
+          <button class="add-item-btn" id="startAddPhaseBtn" style="background:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:2px dashed #dce4ec;font-size:14px">+ Add new phase</button>`}
+      </div>
+    </div>
+    <div class="footer">Lighthouse Wellness · Powered by Firebase · All changes sync in real time</div>`;
+
+  bindEvents();
+}
+
+function bindEvents() {
+  // Switch user
+  document.getElementById("switchUserBtn")?.addEventListener("click", () => {
+    userName = ""; localStorage.removeItem("lw_username"); render();
+  });
+
+  // Save version manually
+  document.getElementById("saveVersionBtn")?.addEventListener("click", async () => {
+    const label = prompt(`Name this version (optional):`, `Saved by ${userName} — ${new Date().toLocaleString()}`);
+    if (label === null) return;
+    await saveSnapshot(label || undefined);
+    alert("✅ Version saved! You can restore it anytime from the Restore panel.");
+  });
+
+  // Restore panel
+  document.getElementById("restoreBtn")?.addEventListener("click", () => {
+    showRestorePanel = !showRestorePanel; render();
+  });
+  document.getElementById("closeRestoreBtn")?.addEventListener("click", () => {
+    showRestorePanel = false; render();
+  });
+  document.querySelectorAll(".restore-snap-btn").forEach(el => {
+    el.addEventListener("click", () => restoreSnapshot(parseInt(el.dataset.id)));
+  });
+
+  // Toggle phase
+  document.querySelectorAll(".toggle-phase").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.phase;
+      collapsed[id] = !collapsed[id];
+      render();
+    });
+  });
+
+  // Toggle check
+  document.querySelectorAll(".toggle-check").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.item;
+      const newChecks = { ...state.checks };
+      const newActivity = { ...state.activity };
+      if (!newActivity[id]) newActivity[id] = [];
+      if (newChecks[id]?.checked) {
+        delete newChecks[id];
+        newActivity[id] = [{ action: "unchecked", by: userName, at: new Date().toISOString() }, ...newActivity[id]].slice(0, 20);
+      } else {
+        newChecks[id] = { checked: true, by: userName, at: new Date().toISOString() };
+        newActivity[id] = [{ action: "checked", by: userName, at: new Date().toISOString() }, ...newActivity[id]].slice(0, 20);
+      }
+      updateState({ checks: newChecks, activity: newActivity });
+    });
+  });
+
+  // Toggle history
+  document.querySelectorAll(".toggle-history-btn").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.item;
+      expandedHistory[id] = !expandedHistory[id];
+      render();
+    });
+  });
+
+  // Toggle uploads
+  document.querySelectorAll(".toggle-uploads-btn").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.item;
+      expandedUploads[id] = !expandedUploads[id];
+      render();
+    });
+  });
+
+  // File upload
+  document.querySelectorAll(".file-upload-input").forEach(el => {
+    el.addEventListener("change", () => {
+      const itemId = el.dataset.item;
+      const files = Array.from(el.files);
+      files.forEach(file => uploadFile(itemId, file));
+    });
+  });
+
+  // Remove upload
+  document.querySelectorAll(".remove-upload-btn").forEach(el => {
+    el.addEventListener("click", () => {
+      const itemId = el.dataset.item;
+      const idx = parseInt(el.dataset.idx);
+      const newUploads = { ...state.uploads, [itemId]: state.uploads[itemId].filter((_,i)=>i!==idx) };
+      updateState({ uploads: newUploads });
+    });
+  });
+
+  // Toggle notes
+  document.querySelectorAll(".toggle-notes-btn").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.item;
+      expandedNotes[id] = !expandedNotes[id];
+      render();
+    });
+  });
+
+  // Toggle docs
+  document.querySelectorAll(".toggle-docs-btn").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.item;
+      expandedDocs[id] = !expandedDocs[id];
+      render();
+    });
+  });
+
+  // Note inputs
+  document.querySelectorAll(".note-input").forEach(el => {
+    el.addEventListener("input", () => { noteInputs[el.dataset.item] = el.value; });
+    el.addEventListener("keydown", (e) => { if (e.key==="Enter") postNote(el.dataset.item); });
+  });
+
+  document.querySelectorAll(".post-note-btn").forEach(el => {
+    el.addEventListener("click", () => postNote(el.dataset.item));
+  });
+
+  // Doc inputs
+  document.querySelectorAll(".doc-label-input").forEach(el => {
+    el.addEventListener("input", () => {
+      if (!docInputs[el.dataset.item]) docInputs[el.dataset.item] = {};
+      docInputs[el.dataset.item].label = el.value;
+    });
+  });
+
+  document.querySelectorAll(".doc-url-input").forEach(el => {
+    el.addEventListener("input", () => {
+      if (!docInputs[el.dataset.item]) docInputs[el.dataset.item] = {};
+      docInputs[el.dataset.item].url = el.value;
+    });
+    el.addEventListener("keydown", (e) => { if (e.key==="Enter") attachDoc(el.dataset.item); });
+  });
+
+  document.querySelectorAll(".attach-doc-btn").forEach(el => {
+    el.addEventListener("click", () => attachDoc(el.dataset.item));
+  });
+
+  document.querySelectorAll(".doc-remove").forEach(el => {
+    el.addEventListener("click", () => {
+      const itemId = el.dataset.item;
+      const idx = parseInt(el.dataset.idx);
+      const newDocs = { ...state.docs, [itemId]: state.docs[itemId].filter((_,i)=>i!==idx) };
+      updateState({ docs: newDocs });
+    });
+  });
+
+  // Add item
+  document.querySelectorAll(".start-add-item").forEach(el => {
+    el.addEventListener("click", () => {
+      addingItem[el.dataset.phase] = true; render();
+      setTimeout(() => document.querySelector(`.new-item-input[data-phase="${el.dataset.phase}"]`)?.focus(), 50);
+    });
+  });
+
+  document.querySelectorAll(".new-item-input").forEach(el => {
+    el.addEventListener("input", () => { newItemTexts[el.dataset.phase] = el.value; });
+    el.addEventListener("keydown", (e) => { if (e.key==="Enter") saveNewItem(el.dataset.phase); });
+  });
+
+  document.querySelectorAll(".save-item-btn").forEach(el => {
+    el.addEventListener("click", () => saveNewItem(el.dataset.phase));
+  });
+
+  // Add phase
+  document.getElementById("startAddPhaseBtn")?.addEventListener("click", () => {
+    addingPhase = true; render();
+    setTimeout(() => document.getElementById("newPhaseInput")?.focus(), 50);
+  });
+  document.getElementById("newPhaseInput")?.addEventListener("input", (e) => { newPhaseText = e.target.value; });
+  document.getElementById("newPhaseInput")?.addEventListener("keydown", (e) => { if (e.key==="Enter") saveNewPhase(); });
+  document.getElementById("savePhaseBtn")?.addEventListener("click", saveNewPhase);
+  document.getElementById("cancelPhaseBtn")?.addEventListener("click", () => { addingPhase = false; newPhaseText = ""; render(); });
+
+  // Edit phase
+  document.querySelectorAll(".edit-phase-btn").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const id = el.dataset.phase;
+      editingPhase[id] = true;
+      editPhaseText[id] = state.phases.find(p=>p.id===id)?.title || "";
+      render();
+      setTimeout(() => document.querySelector(`.edit-phase-input[data-phase="${id}"]`)?.focus(), 50);
+    });
+  });
+
+  document.querySelectorAll(".edit-phase-input").forEach(el => {
+    el.addEventListener("click", (e) => e.stopPropagation());
+    el.addEventListener("input", () => { editPhaseText[el.dataset.phase] = el.value; });
+    el.addEventListener("keydown", (e) => { if (e.key==="Enter") savePhaseEdit(el.dataset.phase); });
+  });
+
+  document.querySelectorAll(".save-phase-btn").forEach(el => {
+    el.addEventListener("click", (e) => { e.stopPropagation(); savePhaseEdit(el.dataset.phase); });
+  });
+
+  document.querySelectorAll(".cancel-edit-phase-btn").forEach(el => {
+    el.addEventListener("click", (e) => { e.stopPropagation(); editingPhase[el.dataset.phase] = false; render(); });
+  });
+
+  // Delete phase
+  document.querySelectorAll(".delete-phase-btn").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (confirm("Delete this phase and all its items?")) {
+        const newPhases = state.phases.filter(p => p.id !== el.dataset.phase);
+        updateState({ phases: newPhases });
+      }
+    });
+  });
+}
+
+const PHASE_COLORS = ["#eef3ff","#e8f5f3","#fff4e8","#f0faf8","#fdf0f8","#f5f0ff","#fff8e8","#f0f8ff"];
+const PHASE_ICONS = ["🏢","🏥","💻","👥","📋","🏠","📊","🎯","📱","🔧"];
+
+function saveNewPhase() {
+  const text = newPhaseText.trim();
+  if (!text) return;
+  const idx = state.phases.length;
+  const newPhase = {
+    id: genId(),
+    title: text,
+    subtitle: "Click ✏️ to rename this phase",
+    icon: PHASE_ICONS[idx % PHASE_ICONS.length],
+    color: PHASE_COLORS[idx % PHASE_COLORS.length],
+    items: []
+  };
+  newPhaseText = "";
+  addingPhase = false;
+  updateState({ phases: [...state.phases, newPhase] });
+}
+
+function savePhaseEdit(phaseId) {
+  const text = (editPhaseText[phaseId] || "").trim();
+  if (!text) return;
+  const newPhases = state.phases.map(p => p.id===phaseId ? { ...p, title: text } : p);
+  editingPhase[phaseId] = false;
+  updateState({ phases: newPhases });
+}
+
+function uploadFile(itemId, file) {
+  const storageRef = window._ref(window._storage, `uploads/${itemId}/${Date.now()}_${file.name}`);
+  const uploadTask = window._uploadBytesResumable(storageRef, file);
+  uploadProgress[itemId] = 0;
+  render();
+  uploadTask.on("state_changed",
+    (snapshot) => {
+      uploadProgress[itemId] = Math.round(snapshot.bytesTransferred / snapshot.totalBytes * 100);
+      render();
+    },
+    (error) => {
+      console.error("Upload error:", error);
+      delete uploadProgress[itemId];
+      alert("Upload failed: " + error.message);
+      render();
+    },
+    async () => {
+      const url = await window._getDownloadURL(uploadTask.snapshot.ref);
+      const newUploads = { ...state.uploads, [itemId]: [...(state.uploads[itemId]||[]), { name: file.name, url, uploadedBy: userName, at: new Date().toISOString() }] };
+      delete uploadProgress[itemId];
+      updateState({ uploads: newUploads });
+    }
+  );
+}
+
+function postNote(itemId) {
+  const text = (noteInputs[itemId] || "").trim();
+  if (!text) return;
+  const newNotes = { ...state.notes, [itemId]: [...(state.notes[itemId]||[]), { author: userName, text, at: new Date().toISOString() }] };
+  noteInputs[itemId] = "";
+  updateState({ notes: newNotes });
+}
+
+function attachDoc(itemId) {
+  const label = (docInputs[itemId]?.label || "").trim();
+  const url = (docInputs[itemId]?.url || "").trim();
+  if (!url) return;
+  const fullUrl = url.startsWith("http") ? url : "https://" + url;
+  const newDocs = { ...state.docs, [itemId]: [...(state.docs[itemId]||[]), { label: label||"Google Drive Document", url: fullUrl, addedBy: userName, at: new Date().toISOString() }] };
+  docInputs[itemId] = { label: "", url: "" };
+  updateState({ docs: newDocs });
+}
+
+function saveNewItem(phaseId) {
+  const text = (newItemTexts[phaseId] || "").trim();
+  if (!text) return;
+  const newPhases = state.phases.map(p => p.id===phaseId ? { ...p, items:[...p.items,{id:genId(),text}] } : p);
+  newItemTexts[phaseId] = "";
+  addingItem[phaseId] = false;
+  updateState({ phases: newPhases });
+}
+
+function submitName(name) {
+  userName = name;
+  localStorage.setItem("lw_username", name);
+  render();
+}
+
+// ── Boot ──
+function init() {
+  subscribeToFirebase();
+  subscribeToSnapshots();
+  render();
+}
+
+if (window._firebaseReady) {
+  init();
+} else {
+  window.addEventListener("firebaseReady", init);
+}
+</script>
+</body>
+</html>
