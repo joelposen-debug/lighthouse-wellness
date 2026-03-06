@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Lighthouse Wellness — Startup Checklist</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -28,7 +27,6 @@
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  // expose for app script below
   window._db = db;
   window._doc = doc;
   window._getDoc = getDoc;
@@ -55,15 +53,13 @@ body { font-family: 'DM Sans', sans-serif; background: #f4f6f8; min-height: 100v
 
 /* Auth screen */
 .name-screen { min-height: 100vh; background: #0f2340; display: flex; align-items: center; justify-content: center; }
-.name-card { background: #fff; border-radius: 20px; padding: 48px 40px; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.name-card { background: #fff; border-radius: 20px; padding: 48px 40px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
 .name-card .logo { font-size: 52px; margin-bottom: 12px; }
 .name-card h1 { font-family: 'DM Serif Display', serif; font-size: 26px; color: #0f2340; font-weight: normal; margin-bottom: 8px; }
 .name-card p { font-size: 14px; color: #7a8c9e; margin-bottom: 22px; line-height: 1.5; }
 .name-card button { width: 100%; padding: 13px; background: #0f2340; color: #fff; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; font-family: inherit; transition: opacity 0.2s; }
 .name-card button:disabled { opacity: 0.4; }
 .small-link { margin-top: 14px; font-size: 12px; color: #7a8c9e; }
-.small-link a { color: #1a7a6e; text-decoration: none; }
-.small-link a:hover { text-decoration: underline; }
 
 /* Header */
 .header { background: #0f2340; padding: 24px 32px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
@@ -74,9 +70,9 @@ body { font-family: 'DM Sans', sans-serif; background: #f4f6f8; min-height: 100v
 .progress-fill { height: 100%; background: #c9973a; border-radius: 99px; transition: width 0.4s; }
 .progress-label { color: #c9973a; font-size: 13px; font-weight: 600; }
 .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-.user-badge { background: rgba(255,255,255,0.1); color: #fff; padding: 6px 14px; border-radius: 99px; font-size: 13px; }
+.user-badge { background: rgba(255,255,255,0.1); color: #fff; padding: 6px 14px; border-radius: 99px; font-size: 13px; max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sync-status { color: #8aaac8; font-size: 11px; min-height: 16px; }
-.header-btns { display: flex; gap: 8px; }
+.header-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .header-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #8aaac8; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-family: inherit; }
 .header-btn:hover { background: rgba(255,255,255,0.05); }
 
@@ -86,35 +82,42 @@ body { font-family: 'DM Sans', sans-serif; background: #f4f6f8; min-height: 100v
 .sync-banner.connecting { background: #c9973a; }
 
 /* Phases */
-.phases { max-width: 760px; margin: 28px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
+.phases { max-width: 860px; margin: 28px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 16px; }
 .phase { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
 .phase-header { padding: 16px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-bottom: 1px solid #eef1f4; user-select: none; }
 .phase-header:hover { background: #fafbfc; }
 .phase-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-.phase-title-wrap { flex: 1; }
+.phase-title-wrap { flex: 1; min-width: 240px; }
 .phase-title { font-size: 15px; font-weight: 600; color: #0f2340; }
 .phase-sub { font-size: 12px; color: #7a8c9e; }
 .phase-count { font-size: 12px; font-weight: 600; color: #7a8c9e; background: #f4f6f8; padding: 3px 10px; border-radius: 99px; }
 .chevron { color: #7a8c9e; font-size: 16px; transition: transform 0.2s; }
 .collapsed .chevron { transform: rotate(-90deg); }
+.phase-actions { display: flex; gap: 6px; }
 
 /* Items */
 .item { border-bottom: 1px solid #f0f3f6; transition: background 0.15s; }
 .item.done { background: #f0faf8; }
+.item.drag-over { outline: 2px dashed #3a7bd5; outline-offset: -2px; }
 .item-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 20px; }
+.drag-handle { width: 26px; height: 26px; border-radius: 8px; display:flex; align-items:center; justify-content:center; cursor: grab; background:#f4f6f8; color:#7a8c9e; flex-shrink:0; margin-top: -2px; user-select:none; }
+.drag-handle:active { cursor: grabbing; }
 .checkbox { width: 22px; height: 22px; border: 2px solid #dce4ec; border-radius: 6px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; background: #fff; }
 .checkbox.checked { background: #1a7a6e; border-color: #1a7a6e; }
 .checkmark { color: #fff; font-size: 13px; font-weight: bold; }
-.item-body { flex: 1; }
+.item-body { flex: 1; min-width: 220px; }
 .item-text { font-size: 14px; line-height: 1.5; color: #1e2d3d; }
 .item.done .item-text { color: #a0b8b4; text-decoration: line-through; }
 .checked-by { font-size: 11px; color: #1a7a6e; margin-top: 3px; }
-.item-btns { display: flex; gap: 6px; flex-shrink: 0; }
+.item-btns { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
 .pill-btn { border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer; font-size: 12px; background: #f4f6f8; color: #7a8c9e; font-family: inherit; transition: all 0.15s; }
 .pill-btn.active-notes { background: #e8f5f3; color: #1a7a6e; }
 .pill-btn.active-docs { background: #fff8e8; color: #c9973a; }
 .pill-btn.has-notes { color: #1a7a6e; }
 .pill-btn.has-docs { color: #c9973a; }
+.assignee-pill { background:#eef5ff; color:#3a7bd5; }
+.assignee-pill.unassigned { background:#f4f6f8; color:#7a8c9e; }
+.inline-actions { margin-top: 8px; display: flex; gap: 8px; align-items:center; flex-wrap: wrap; }
 
 /* Notes */
 .notes-section { padding: 0 20px 16px 54px; border-top: 1px dashed #eef1f4; }
@@ -128,6 +131,9 @@ body { font-family: 'DM Sans', sans-serif; background: #f4f6f8; min-height: 100v
 .text-input:focus { border-color: #1a7a6e; }
 .submit-btn { padding: 8px 16px; background: #1a7a6e; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit; }
 .submit-btn:hover { opacity: 0.9; }
+.cancel-btn { padding: 8px 12px; background: #f4f6f8; color: #7a8c9e; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit; }
+.save-btn { padding: 8px 16px; background: #0f2340; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit; }
+.save-btn:hover { opacity: 0.95; }
 
 /* Docs */
 .docs-section { padding: 12px 20px 16px 54px; border-top: 1px dashed #fff0d0; background: #fffdf5; }
@@ -144,46 +150,34 @@ body { font-family: 'DM Sans', sans-serif; background: #f4f6f8; min-height: 100v
 
 /* Add item */
 .add-item-wrap { padding: 10px 20px 14px; }
-.add-item-row { display: flex; gap: 8px; }
-.add-item-btn { background: none; border: 1px dashed #dce4ec; color: #7a8c9e; padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; width: 100%; text-align: left; font-family: inherit; }
-.add-item-btn:hover { border-color: #1a7a6e; color: #1a7a6e; }
-.save-btn { padding: 8px 16px; background: #0f2340; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit; }
-.cancel-btn { padding: 8px 12px; background: #f4f6f8; color: #7a8c9e; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit; }
+.add-item-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
+/* Panels */
+.panel-wrap { background:#fff; border-bottom:2px solid #eef1f4; padding:20px 32px; }
+.panel-inner { max-width: 860px; margin: 0 auto; }
+.panel-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; gap:12px; }
+.panel-title { font-size:15px; font-weight:600; color:#0f2340; }
+.panel-close { background:none; border:none; color:#7a8c9e; cursor:pointer; font-size:18px; }
+.panel-note { font-size:11px; color:#7a8c9e; margin-top:8px; }
+
+/* People manager */
+.people-row { display:flex; gap:8px; flex-wrap:wrap; }
+.person-pill { display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid #eef1f4; border-radius:10px; background:#fafbfc; }
+.person-pill strong { color:#0f2340; font-size:13px; }
+.person-pill span { color:#7a8c9e; font-size:12px; }
+.person-pill button { background:none; border:none; color:#c0392b; cursor:pointer; font-size:14px; }
+.dropdown { width: 240px; padding: 8px; border: 1px solid #dce4ec; border-radius: 10px; background:#fff; font-family: inherit; font-size: 13px; }
+
+/* Footer */
 .footer { text-align: center; font-size: 12px; color: #7a8c9e; margin-top: 24px; padding: 0 16px 40px; }
 
 /* Loading */
 .loading-screen { min-height: 100vh; background: #0f2340; display: flex; align-items: center; justify-content: center; color: #8aaac8; font-size: 16px; gap: 12px; }
-
-/* Activity history */
-.history-section { padding: 0 20px 16px 54px; border-top: 1px dashed #eef1f4; background: #fafbfc; }
-.history-title { font-size: 12px; font-weight: 600; color: #7a8c9e; margin-bottom: 8px; padding-top: 12px; }
-.history-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #f0f3f6; font-size: 12px; color: #5a6a7e; }
-.history-item:last-child { border-bottom: none; }
-.history-icon { font-size: 14px; flex-shrink: 0; }
-.history-time { color: #a0b0c0; font-size: 11px; margin-left: auto; white-space: nowrap; }
-
-/* File upload */
-.upload-section { padding: 12px 20px 16px 54px; border-top: 1px dashed #d0e8ff; background: #f5f9ff; }
-.upload-title { font-size: 12px; font-weight: 600; color: #3a7bd5; margin-bottom: 10px; }
-.upload-drop { border: 2px dashed #b0cef0; border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; background: #fff; transition: all 0.2s; }
-.upload-drop:hover { border-color: #3a7bd5; background: #eef5ff; }
-.upload-drop input { display: none; }
-.upload-drop-text { font-size: 13px; color: #7a8c9e; }
-.upload-drop-text strong { color: #3a7bd5; }
-.upload-file-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 8px 10px; background: #fff; border-radius: 8px; border: 1px solid #d0e0f0; }
-.upload-file-link { flex: 1; color: #0f2340; font-size: 13px; text-decoration: none; font-weight: 500; }
-.upload-file-link:hover { color: #3a7bd5; }
-.upload-file-meta { font-size: 11px; color: #7a8c9e; white-space: nowrap; }
-.upload-progress { height: 4px; background: #e0eaf5; border-radius: 99px; overflow: hidden; margin-top: 8px; }
-.upload-progress-fill { height: 100%; background: #3a7bd5; border-radius: 99px; transition: width 0.3s; }
 </style>
 </head>
-<body>
 
-<div id="app">
-  <div class="loading-screen">⟳ Loading…</div>
-</div>
+<body>
+<div id="app"><div class="loading-screen">⟳ Loading…</div></div>
 
 <script type="module">
 const INITIAL_PHASES = [
@@ -229,10 +223,13 @@ const INITIAL_PHASES = [
     ]},
 ];
 
-function genId() { return "i-" + Math.random().toString(36).substr(2,9); }
+function genId(prefix="i") { return `${prefix}-` + Math.random().toString(36).slice(2, 10); }
 function fmt(iso) {
   const d = new Date(iso);
   return d.toLocaleDateString("en-US",{month:"short",day:"numeric"}) + " at " + d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+}
+function escapeHtml(s) {
+  return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
 // ── State ──
@@ -240,28 +237,55 @@ let userName = "";
 let userEmail = "";
 let userUid = "";
 
-let state = { phases: INITIAL_PHASES, checks: {}, notes: {}, docs: {}, activity: {}, uploads: {} };
+let state = {
+  phases: INITIAL_PHASES,
+  checks: {},
+  notes: {},
+  docs: {},
+  activity: {},
+  uploads: {},
+  people: [
+    // managed list for assignments
+    { id: "unassigned", name: "Unassigned", email: "" }
+  ],
+  assignments: {} // itemId -> { personId, name, email }
+};
+
 let collapsed = {};
 let expandedNotes = {};
 let expandedDocs = {};
+let expandedHistory = {};
+let expandedUploads = {};
+
 let addingItem = {};
 let noteInputs = {};
 let docInputs = {};
 let newItemTexts = {};
-let syncStatus = "connecting";
-let unsubscribe = null;
 
 let addingPhase = false;
 let newPhaseText = "";
+
 let editingPhase = {};
 let editPhaseText = {};
-let expandedHistory = {};
-let expandedUploads = {};
-let uploadProgress = {};
+
+let editingItem = {};
+let editItemText = {};
+
+let showPeoplePanel = false;
+let newPersonName = "";
+let newPersonEmail = "";
+
+let syncStatus = "connecting";
+let unsubscribe = null;
+
 let showRestorePanel = false;
 let snapshots = [];
 let lastChangeAt = null;
 let lastSnapshotAt = null;
+
+let uploadProgress = {}; // itemId -> percent
+
+let dragState = null; // { itemId, fromPhaseId }
 
 // Auto-save a version every 10 min if something changed
 setInterval(async () => {
@@ -332,9 +356,10 @@ function subscribeToFirebase() {
         docs: data.docs || {},
         activity: data.activity || {},
         uploads: data.uploads || {},
+        people: (data.people && Array.isArray(data.people) && data.people.length) ? data.people : [{ id:"unassigned", name:"Unassigned", email:"" }],
+        assignments: data.assignments || {},
       };
     } else {
-      // First time — save initial data
       saveToFirebase(state);
     }
     syncStatus = "live";
@@ -353,6 +378,22 @@ function updateState(updates) {
   render();
 }
 
+// ── Item helpers ──
+function findItemText(itemId) {
+  for (const p of state.phases) {
+    const it = p.items.find(x => x.id === itemId);
+    if (it) return it.text;
+  }
+  return "";
+}
+function getAssignment(itemId) {
+  return state.assignments?.[itemId] || { personId: "unassigned", name: "Unassigned", email: "" };
+}
+function getPeopleOptionsHtml(selectedId) {
+  const opts = (state.people || []).map(p => `<option value="${escapeHtml(p.id)}" ${p.id===selectedId?"selected":""}>${escapeHtml(p.name)}${p.email ? ` (${escapeHtml(p.email)})` : ""}</option>`).join("");
+  return opts;
+}
+
 // ── Render ──
 function render() {
   const app = document.getElementById("app");
@@ -366,7 +407,7 @@ function render() {
           <h1>Lighthouse Wellness</h1>
           <p>Sign in with Google to access the internal checklist.</p>
           <button id="googleBtn">Sign in with Google</button>
-          <div class="small-link">Having trouble? Try a different Google account.</div>
+          <div class="small-link">If you have multiple Google accounts, choose the correct one.</div>
         </div>
       </div>`;
     document.getElementById("googleBtn").addEventListener("click", async () => {
@@ -391,224 +432,322 @@ function render() {
 
   let phasesHTML = state.phases.map(phase => {
     const phaseDone = phase.items.filter(i => state.checks[i.id]?.checked).length;
-    const isCollapsed = collapsed[phase.id];
+    const isCollapsed = !!collapsed[phase.id];
 
     const itemsHTML = phase.items.map(item => {
       const check = state.checks[item.id];
       const isDone = check?.checked;
       const itemNotes = state.notes[item.id] || [];
       const itemDocs = state.docs[item.id] || [];
-      const notesOpen = expandedNotes[item.id];
-      const docsOpen = expandedDocs[item.id];
+      const itemUploads = state.uploads[item.id] || [];
+      const notesOpen = !!expandedNotes[item.id];
+      const docsOpen = !!expandedDocs[item.id];
+      const uploadsOpen = !!expandedUploads[item.id];
+      const historyOpen = !!expandedHistory[item.id];
+      const assignment = getAssignment(item.id);
 
       const notesSection = notesOpen ? `
         <div class="notes-section">
           ${itemNotes.length===0 ? '<div class="no-content">No notes yet. Be the first!</div>' : ""}
           ${itemNotes.map(n => `
             <div class="note-item">
-              <div class="note-author">${n.author} <span class="note-time">· ${fmt(n.at)}</span></div>
-              <div class="note-text">${String(n.text).replace(/</g,"&lt;")}</div>
+              <div class="note-author">${escapeHtml(n.author)} <span class="note-time">· ${fmt(n.at)}</span></div>
+              <div class="note-text">${escapeHtml(n.text)}</div>
             </div>`).join("")}
           <div class="input-row">
-            <input class="text-input note-input" data-item="${item.id}" placeholder="Add a note as ${userName}..." value="${(noteInputs[item.id]||"").replace(/"/g,"&quot;")}" />
-            <button class="submit-btn post-note-btn" data-item="${item.id}">Post</button>
+            <input class="text-input note-input" data-item="${escapeHtml(item.id)}" placeholder="Add a note as ${escapeHtml(userName)}..." value="${escapeHtml(noteInputs[item.id]||"")}" />
+            <button class="submit-btn post-note-btn" data-item="${escapeHtml(item.id)}">Post</button>
           </div>
         </div>` : "";
 
       const docsSection = docsOpen ? `
         <div class="docs-section">
-          <div class="docs-title">📎 Google Drive Documents</div>
-          ${itemDocs.length===0 ? '<div class="no-content">No documents attached yet.</div>' : ""}
-          ${itemDocs.map((doc,i) => `
+          <div class="docs-title">📎 Links</div>
+          ${itemDocs.length===0 ? '<div class="no-content">No links attached yet.</div>' : ""}
+          ${itemDocs.map((d,i) => `
             <div class="doc-item">
-              <span>📄</span>
-              <a href="${doc.url}" target="_blank" rel="noopener noreferrer" class="doc-link">${String(doc.label||"Google Drive Document").replace(/</g,"&lt;")}</a>
-              <span class="doc-meta">by ${doc.addedBy || "Unknown"}</span>
-              <button class="doc-remove" data-item="${item.id}" data-idx="${i}">✕</button>
+              <span>🔗</span>
+              <a href="${escapeHtml(d.url)}" target="_blank" rel="noopener noreferrer" class="doc-link">${escapeHtml(d.label||"Link")}</a>
+              <span class="doc-meta">by ${escapeHtml(d.addedBy || "Unknown")}</span>
+              <button class="doc-remove doc-remove-btn" data-item="${escapeHtml(item.id)}" data-idx="${i}">✕</button>
             </div>`).join("")}
           <div class="doc-inputs">
-            <input class="text-input doc-label-input" data-item="${item.id}" placeholder="Document name (optional)..." value="${(docInputs[item.id]?.label||"").replace(/"/g,"&quot;")}" />
-            <input class="text-input doc-url-input" data-item="${item.id}" placeholder="Paste Google Drive link..." value="${(docInputs[item.id]?.url||"").replace(/"/g,"&quot;")}" />
-            <button class="attach-btn attach-doc-btn" data-item="${item.id}">📎 Attach Document</button>
+            <input class="text-input doc-label-input" data-item="${escapeHtml(item.id)}" placeholder="Link name (optional)..." value="${escapeHtml(docInputs[item.id]?.label||"")}" />
+            <input class="text-input doc-url-input" data-item="${escapeHtml(item.id)}" placeholder="Paste link..." value="${escapeHtml(docInputs[item.id]?.url||"")}" />
+            <button class="attach-btn attach-doc-btn" data-item="${escapeHtml(item.id)}">Attach</button>
           </div>
         </div>` : "";
 
+      const uploadsSection = uploadsOpen ? `
+        <div class="docs-section" style="background:#f5f9ff;border-top:1px dashed #d0e8ff;">
+          <div class="docs-title" style="color:#3a7bd5;">📁 Files</div>
+          ${itemUploads.length===0 ? '<div class="no-content">No files uploaded yet.</div>' : ""}
+          ${itemUploads.map((f,i) => `
+            <div class="doc-item" style="border-color:#d0e0f0;">
+              <span>📄</span>
+              <a href="${escapeHtml(f.url)}" target="_blank" rel="noopener noreferrer" class="doc-link">${escapeHtml(f.name)}</a>
+              <span class="doc-meta">by ${escapeHtml(f.uploadedBy || "Unknown")}</span>
+              <button class="doc-remove remove-upload-btn" data-item="${escapeHtml(item.id)}" data-idx="${i}">✕</button>
+            </div>`).join("")}
+          ${uploadProgress[item.id] !== undefined ? `
+            <div style="font-size:12px;color:#3a7bd5;margin:8px 0">Uploading... ${uploadProgress[item.id]}%</div>
+            <div style="height:4px;background:#e0eaf5;border-radius:99px;overflow:hidden;">
+              <div style="height:100%;background:#3a7bd5;border-radius:99px;width:${uploadProgress[item.id]}%"></div>
+            </div>` : ""}
+          <label class="upload-drop" style="margin-top:10px;display:block;border:2px dashed #b0cef0;border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:#fff;">
+            <input type="file" class="file-upload-input" data-item="${escapeHtml(item.id)}" multiple style="display:none" />
+            <div class="upload-drop-text" style="font-size:13px;color:#7a8c9e;">📂 <strong style="color:#3a7bd5;">Click to upload</strong> files</div>
+          </label>
+        </div>` : "";
+
+      const historySection = historyOpen ? `
+        <div class="notes-section" style="background:#fafbfc;">
+          <div style="font-size:12px;font-weight:600;color:#7a8c9e;margin:12px 0 8px;">🕐 Activity History</div>
+          ${(state.activity[item.id]||[]).length===0 ? '<div class="no-content">No activity yet.</div>' : ""}
+          ${(state.activity[item.id]||[]).map(a => `
+            <div style="display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid #f0f3f6;font-size:12px;color:#5a6a7e;">
+              <span style="font-size:14px;">${a.action==="checked"?"✅":a.action==="unchecked"?"↩️":"✏️"}</span>
+              <span><strong>${escapeHtml(a.by)}</strong> ${a.action==="checked"?"checked":"unchecked"} this</span>
+              <span style="margin-left:auto;font-size:11px;color:#a0b0c0;white-space:nowrap;">${fmt(a.at)}</span>
+            </div>`).join("")}
+        </div>` : "";
+
+      const editing = !!editingItem[item.id];
+
       return `
-        <div class="item ${isDone?"done":""}" data-item-id="${item.id}">
+        <div class="item ${isDone?"done":""}" data-item-id="${escapeHtml(item.id)}" data-phase-id="${escapeHtml(phase.id)}">
           <div class="item-row">
-            <div class="checkbox ${isDone?"checked":""} toggle-check" data-item="${item.id}">
+            <div class="drag-handle" draggable="true" data-item="${escapeHtml(item.id)}" data-phase="${escapeHtml(phase.id)}" title="Drag to reorder">↕</div>
+
+            <div class="checkbox ${isDone?"checked":""} toggle-check" data-item="${escapeHtml(item.id)}">
               ${isDone ? '<span class="checkmark">✓</span>' : ""}
             </div>
+
             <div class="item-body">
-              <div class="item-text">${item.text.replace(/</g,"&lt;")}</div>
-              ${isDone ? `<div class="checked-by">✓ Checked off by <strong>${check.by}</strong> · ${fmt(check.at)}</div>` : ""}
+              <div class="item-text">
+                ${
+                  editing
+                    ? `<input class="text-input edit-item-input" data-item="${escapeHtml(item.id)}" value="${escapeHtml(editItemText[item.id] ?? item.text)}" />`
+                    : escapeHtml(item.text)
+                }
+              </div>
+
+              ${editing ? `
+                <div class="inline-actions">
+                  <button class="submit-btn save-item-edit-btn" data-item="${escapeHtml(item.id)}">Save</button>
+                  <button class="cancel-btn cancel-item-edit-btn" data-item="${escapeHtml(item.id)}">Cancel</button>
+                </div>` : ""}
+
+              ${isDone ? `<div class="checked-by">✓ Checked off by <strong>${escapeHtml(check.by)}</strong> · ${fmt(check.at)}</div>` : ""}
+              ${assignment?.personId && assignment.personId !== "unassigned" ? `<div class="checked-by" style="color:#3a7bd5;">Assigned to <strong>${escapeHtml(assignment.name || "Someone")}</strong></div>` : ""}
             </div>
+
             <div class="item-btns">
-              <button class="pill-btn toggle-notes-btn ${notesOpen?"active-notes":""} ${itemNotes.length?"has-notes":""}" data-item="${item.id}">
+              <button class="pill-btn assignee-btn ${assignment.personId==="unassigned"?"unassigned":"assignee-pill"}" data-item="${escapeHtml(item.id)}" title="Assign">
+                👤 ${escapeHtml((assignment.name || "Unassigned").split(" ")[0])}
+              </button>
+
+              <button class="pill-btn toggle-notes-btn ${notesOpen?"active-notes":""} ${itemNotes.length?"has-notes":""}" data-item="${escapeHtml(item.id)}">
                 💬${itemNotes.length>0?" "+itemNotes.length:""}
               </button>
-              <button class="pill-btn toggle-docs-btn ${docsOpen?"active-docs":""} ${itemDocs.length?"has-docs":""}" data-item="${item.id}">
-                📎${itemDocs.length>0?" "+itemDocs.length:""}
+
+              <button class="pill-btn toggle-docs-btn ${docsOpen?"active-docs":""} ${itemDocs.length?"has-docs":""}" data-item="${escapeHtml(item.id)}">
+                🔗${itemDocs.length>0?" "+itemDocs.length:""}
               </button>
-              <button class="pill-btn toggle-uploads-btn ${expandedUploads[item.id]?"active-docs":""} ${(state.uploads[item.id]||[]).length?"has-docs":""}" data-item="${item.id}" title="Upload files">
-                📁${(state.uploads[item.id]||[]).length>0?" "+(state.uploads[item.id]||[]).length:""}
+
+              <button class="pill-btn toggle-uploads-btn ${uploadsOpen?"active-docs":""} ${itemUploads.length?"has-docs":""}" data-item="${escapeHtml(item.id)}" title="Files">
+                📁${itemUploads.length>0?" "+itemUploads.length:""}
               </button>
-              <button class="pill-btn toggle-history-btn ${expandedHistory[item.id]?"active-notes":""} ${(state.activity[item.id]||[]).length?"has-notes":""}" data-item="${item.id}" title="View history">
+
+              <button class="pill-btn toggle-history-btn ${historyOpen?"active-notes":""} ${(state.activity[item.id]||[]).length?"has-notes":""}" data-item="${escapeHtml(item.id)}" title="History">
                 🕐${(state.activity[item.id]||[]).length>0?" "+(state.activity[item.id]||[]).length:""}
               </button>
+
+              <button class="pill-btn edit-item-btn" data-item="${escapeHtml(item.id)}" title="Edit step">✏️</button>
+              <button class="pill-btn delete-item-btn" data-item="${escapeHtml(item.id)}" data-phase="${escapeHtml(phase.id)}" title="Delete step" style="color:#e74c3c">🗑</button>
             </div>
           </div>
+
+          ${editingItem[item.id] ? `
+            <div class="notes-section" style="padding-top:8px;">
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <div style="font-size:12px;color:#7a8c9e;">Assign:</div>
+                <select class="dropdown assignee-select" data-item="${escapeHtml(item.id)}">
+                  ${getPeopleOptionsHtml(assignment.personId || "unassigned")}
+                </select>
+                <button class="pill-btn manage-people-btn" title="Manage people">Manage People</button>
+              </div>
+            </div>` : ""}
+
           ${notesSection}
           ${docsSection}
-          ${expandedUploads[item.id] ? `
-            <div class="upload-section">
-              <div class="upload-title">📁 File Uploads</div>
-              ${(state.uploads[item.id]||[]).map((f,i) => `
-                <div class="upload-file-item">
-                  <span>📄</span>
-                  <a href="${f.url}" target="_blank" rel="noopener noreferrer" class="upload-file-link">${f.name}</a>
-                  <span class="upload-file-meta">by ${f.uploadedBy} · ${fmt(f.at)}</span>
-                  <button class="doc-remove remove-upload-btn" data-item="${item.id}" data-idx="${i}">✕</button>
-                </div>`).join("")}
-              ${(state.uploads[item.id]||[]).length===0 ? '<div class="no-content">No files uploaded yet.</div>' : ""}
-              ${uploadProgress[item.id] !== undefined ? `
-                <div style="font-size:12px;color:#3a7bd5;margin:8px 0">Uploading... ${uploadProgress[item.id]}%</div>
-                <div class="upload-progress"><div class="upload-progress-fill" style="width:${uploadProgress[item.id]}%"></div></div>` : ""}
-              <label class="upload-drop" style="margin-top:10px;display:block">
-                <input type="file" class="file-upload-input" data-item="${item.id}" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.gif,.txt,.csv" />
-                <div class="upload-drop-text">📂 <strong>Click to upload</strong> or drag & drop<br><span style="font-size:11px">PDF, Word, Excel, Images supported</span></div>
-              </label>
-            </div>` : ""}
-          ${expandedHistory[item.id] ? `
-            <div class="history-section">
-              <div class="history-title">🕐 Activity History</div>
-              ${(state.activity[item.id]||[]).length===0 ? '<div class="no-content">No activity yet.</div>' : ""}
-              ${(state.activity[item.id]||[]).map(a => `
-                <div class="history-item">
-                  <span class="history-icon">${a.action==="checked"?"✅":"↩️"}</span>
-                  <span><strong>${a.by}</strong> ${a.action==="checked"?"checked this off":"unchecked this"}</span>
-                  <span class="history-time">${fmt(a.at)}</span>
-                </div>`).join("")}
-            </div>` : ""}
+          ${uploadsSection}
+          ${historySection}
         </div>`;
     }).join("");
 
     const addItemHTML = addingItem[phase.id] ? `
       <div class="add-item-row">
-        <input class="text-input new-item-input" data-phase="${phase.id}" placeholder="New item..." value="${(newItemTexts[phase.id]||"").replace(/"/g,"&quot;")}" autocomplete="off" />
-        <button class="save-btn save-item-btn" data-phase="${phase.id}">Add</button>
-        <button class="cancel-btn cancel-item-btn" data-phase="${phase.id}">✕</button>
-      </div>` : `<button class="add-item-btn start-add-item" data-phase="${phase.id}">+ Add item</button>`;
+        <input class="text-input new-item-input" data-phase="${escapeHtml(phase.id)}" placeholder="New item..." value="${escapeHtml(newItemTexts[phase.id]||"")}" autocomplete="off" />
+        <button class="save-btn save-item-btn" data-phase="${escapeHtml(phase.id)}">Add</button>
+        <button class="cancel-btn cancel-item-btn" data-phase="${escapeHtml(phase.id)}">✕</button>
+      </div>` : `<button class="pill-btn start-add-item" data-phase="${escapeHtml(phase.id)}" style="width:100%;text-align:left;padding:10px 12px;border:1px dashed #dce4ec;background:#fff;">+ Add item</button>`;
 
     return `
-      <div class="phase ${isCollapsed?"collapsed":""}" data-phase-id="${phase.id}">
-        <div class="phase-header-wrap">
-          <div class="phase-header toggle-phase" data-phase="${phase.id}">
-            <div class="phase-icon" style="background:${phase.color}">${phase.icon}</div>
-            <div class="phase-title-wrap">
-              ${editingPhase[phase.id] ? `
-                <input class="text-input edit-phase-input" data-phase="${phase.id}" value="${(editPhaseText[phase.id]||phase.title).replace(/"/g,"&quot;")}" style="font-size:14px;font-weight:600;" />
-              ` : `
-                <div class="phase-title">${phase.title}</div>
-                <div class="phase-sub">${phase.subtitle}</div>
-              `}
-            </div>
-            <div class="phase-count">${phaseDone}/${phase.items.length}</div>
-            <div class="phase-actions">
-              ${editingPhase[phase.id] ? `
-                <button class="pill-btn save-phase-btn" data-phase="${phase.id}" style="color:#1a7a6e">✓</button>
-                <button class="pill-btn cancel-edit-phase-btn" data-phase="${phase.id}">✕</button>
-              ` : `
-                <button class="pill-btn edit-phase-btn" data-phase="${phase.id}" title="Rename phase">✏️</button>
-                <button class="pill-btn delete-phase-btn" data-phase="${phase.id}" title="Delete phase" style="color:#e74c3c">🗑</button>
-              `}
-            </div>
-            <div class="chevron">▾</div>
+      <div class="phase ${isCollapsed?"collapsed":""}" data-phase-id="${escapeHtml(phase.id)}">
+        <div class="phase-header toggle-phase" data-phase="${escapeHtml(phase.id)}">
+          <div class="phase-icon" style="background:${phase.color}">${phase.icon}</div>
+          <div class="phase-title-wrap">
+            ${editingPhase[phase.id] ? `
+              <input class="text-input edit-phase-input" data-phase="${escapeHtml(phase.id)}" value="${escapeHtml(editPhaseText[phase.id]||phase.title)}" style="font-size:14px;font-weight:600;" />
+            ` : `
+              <div class="phase-title">${escapeHtml(phase.title)}</div>
+              <div class="phase-sub">${escapeHtml(phase.subtitle)}</div>
+            `}
           </div>
+          <div class="phase-count">${phaseDone}/${phase.items.length}</div>
+          <div class="phase-actions">
+            ${editingPhase[phase.id] ? `
+              <button class="pill-btn save-phase-btn" data-phase="${escapeHtml(phase.id)}" style="color:#1a7a6e" title="Save">✓</button>
+              <button class="pill-btn cancel-edit-phase-btn" data-phase="${escapeHtml(phase.id)}" title="Cancel">✕</button>
+            ` : `
+              <button class="pill-btn edit-phase-btn" data-phase="${escapeHtml(phase.id)}" title="Rename phase">✏️</button>
+              <button class="pill-btn delete-phase-btn" data-phase="${escapeHtml(phase.id)}" title="Delete phase" style="color:#e74c3c">🗑</button>
+            `}
+          </div>
+          <div class="chevron">▾</div>
         </div>
+
         ${!isCollapsed ? `<div>${itemsHTML}<div class="add-item-wrap">${addItemHTML}</div></div>` : ""}
       </div>`;
   }).join("");
+
+  const peoplePanel = showPeoplePanel ? `
+    <div class="panel-wrap">
+      <div class="panel-inner">
+        <div class="panel-header">
+          <div class="panel-title">👥 People (for assignments)</div>
+          <button class="panel-close" id="closePeopleBtn">✕</button>
+        </div>
+
+        <div class="people-row" style="margin-bottom:12px;">
+          <input class="text-input" id="newPersonName" placeholder="Name (e.g., Sara)" value="${escapeHtml(newPersonName)}" style="max-width:260px;" />
+          <input class="text-input" id="newPersonEmail" placeholder="Email (optional)" value="${escapeHtml(newPersonEmail)}" style="max-width:300px;" />
+          <button class="save-btn" id="addPersonBtn">Add</button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${(state.people || []).filter(p => p.id !== "unassigned").map(p => `
+            <div class="person-pill">
+              <div style="flex:1;">
+                <strong>${escapeHtml(p.name)}</strong>
+                ${p.email ? `<span>· ${escapeHtml(p.email)}</span>` : `<span>· (no email)</span>`}
+              </div>
+              <button class="remove-person-btn" data-person="${escapeHtml(p.id)}" title="Remove">🗑</button>
+            </div>
+          `).join("")}
+          ${(state.people || []).filter(p => p.id !== "unassigned").length === 0 ? `<div class="no-content">No people added yet. Add names above.</div>` : ""}
+        </div>
+
+        <div class="panel-note">Note: Removing a person will keep existing items assigned, but they’ll show as “Unassigned” after refresh if the person no longer exists.</div>
+      </div>
+    </div>` : "";
+
+  const restorePanel = showRestorePanel ? `
+    <div class="panel-wrap">
+      <div class="panel-inner">
+        <div class="panel-header">
+          <div class="panel-title">🕐 Restore a Previous Version</div>
+          <button class="panel-close" id="closeRestoreBtn">✕</button>
+        </div>
+        ${snapshots.length === 0 ? '<div class="no-content">No saved versions yet.</div>' : ""}
+        ${snapshots.map(s => `
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #eef1f4;border-radius:10px;margin-bottom:8px;background:#fafbfc;">
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:600;color:#0f2340;">${escapeHtml(s.label)}</div>
+              <div style="font-size:11px;color:#7a8c9e;">${fmt(s.at)}</div>
+            </div>
+            <button class="save-btn restore-snap-btn" data-id="${s.id}" style="background:#0f2340;">Restore</button>
+          </div>`).join("")}
+        <div class="panel-note">⚠ Restoring overwrites current data. A backup is saved automatically before restoring.</div>
+      </div>
+    </div>` : "";
 
   app.innerHTML = `
     <div class="header">
       <div>
         <h1>Lighthouse Wellness</h1>
-        <div class="header-sub">Home Health Case Management · New York · Medicaid Services</div>
+        <div class="header-sub">Internal startup checklist · real-time collaboration</div>
         <div class="progress-wrap">
           <div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div>
           <span class="progress-label">${totalDone}/${totalItems} complete</span>
         </div>
       </div>
       <div class="header-right">
-        <div class="user-badge">👤 ${userName}</div>
-        <div class="sync-status">${syncLabel}</div>
+        <div class="user-badge">👤 ${escapeHtml(userName)} ${userEmail ? `· ${escapeHtml(userEmail)}` : ""}</div>
+        <div class="sync-status">${escapeHtml(syncLabel)}</div>
         <div class="header-btns">
-          <button class="header-btn" id="logoutBtn">Logout</button>
+          <button class="header-btn" id="peopleBtn">People</button>
           <button class="header-btn" id="saveVersionBtn">💾 Save Version</button>
           <button class="header-btn" id="restoreBtn">🕐 Restore</button>
+          <button class="header-btn" id="logoutBtn">Logout</button>
         </div>
       </div>
     </div>
+
     <div class="${bannerClass}">
       <span>🔴</span>
-      <span>${syncStatus==="live" ? "Live sync active — all team members see updates instantly." : syncStatus==="connecting" ? "Connecting to Firebase..." : "Connection error. Check your internet connection."}</span>
+      <span>${syncStatus==="live" ? "Live sync active — everyone sees updates instantly." : syncStatus==="connecting" ? "Connecting to Firebase..." : "Connection error. Check your internet connection."}</span>
     </div>
 
-    ${showRestorePanel ? `
-    <div style="background:#fff;border-bottom:2px solid #eef1f4;padding:20px 32px;">
-      <div style="max-width:760px;margin:0 auto;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <div style="font-size:15px;font-weight:600;color:#0f2340;">🕐 Restore a Previous Version</div>
-          <button id="closeRestoreBtn" style="background:none;border:none;color:#7a8c9e;cursor:pointer;font-size:18px;">✕</button>
-        </div>
-        ${snapshots.length === 0 ? '<div style="font-size:13px;color:#7a8c9e;">No saved versions yet.</div>' : ""}
-        ${snapshots.map(s => `
-          <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #eef1f4;border-radius:10px;margin-bottom:8px;background:#fafbfc;">
-            <div style="flex:1;">
-              <div style="font-size:13px;font-weight:600;color:#0f2340;">${s.label}</div>
-              <div style="font-size:11px;color:#7a8c9e;">${fmt(s.at)}</div>
-            </div>
-            <button class="restore-snap-btn" data-id="${s.id}" style="padding:7px 14px;background:#0f2340;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;">Restore</button>
-          </div>`).join("")}
-        <div style="font-size:11px;color:#7a8c9e;margin-top:8px;">⚠ Restoring will overwrite current data. A backup is saved automatically before restoring.</div>
-      </div>
-    </div>` : ""}
+    ${peoplePanel}
+    ${restorePanel}
 
-    <div class="phases">${phasesHTML}
+    <div class="phases">
+      ${phasesHTML}
+
       <div style="padding:8px 0">
         ${addingPhase ? `
           <div class="add-item-row" style="background:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.05)">
-            <input class="text-input" id="newPhaseInput" placeholder="Phase name (e.g. Phase 7 — Marketing)..." value="${newPhaseText.replace(/"/g,"&quot;")}" style="font-size:14px" />
+            <input class="text-input" id="newPhaseInput" placeholder="Phase name (e.g. Phase 7 — Marketing)..." value="${escapeHtml(newPhaseText)}" style="font-size:14px" />
             <button class="save-btn" id="savePhaseBtn">Add Phase</button>
             <button class="cancel-btn" id="cancelPhaseBtn">✕</button>
           </div>` : `
-          <button class="add-item-btn" id="startAddPhaseBtn" style="background:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:2px dashed #dce4ec;font-size:14px">+ Add new phase</button>`}
+          <button class="pill-btn" id="startAddPhaseBtn" style="width:100%;text-align:left;background:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:2px dashed #dce4ec;font-size:14px">+ Add new phase</button>`}
       </div>
     </div>
-    <div class="footer">Lighthouse Wellness · Powered by Firebase · All changes sync in real time</div>`;
+
+    <div class="footer">Tip: use ↕ to drag steps. Use 👤 to assign. Use ✏️ to edit and 🗑 to delete.</div>
+  `;
 
   bindEvents();
 }
 
 function bindEvents() {
-  // Logout
+  // Header buttons
   document.getElementById("logoutBtn")?.addEventListener("click", async () => {
     try { await window._signOut(window._auth); } catch(e) {}
   });
 
-  // Save version manually
   document.getElementById("saveVersionBtn")?.addEventListener("click", async () => {
     const label = prompt(`Name this version (optional):`, `Saved by ${userName} — ${new Date().toLocaleString()}`);
     if (label === null) return;
     await saveSnapshot(label || undefined);
-    alert("✅ Version saved! You can restore it anytime from the Restore panel.");
+    alert("✅ Version saved.");
   });
 
-  // Restore panel
   document.getElementById("restoreBtn")?.addEventListener("click", () => {
-    showRestorePanel = !showRestorePanel; render();
+    showRestorePanel = !showRestorePanel;
+    if (showRestorePanel) showPeoplePanel = false;
+    render();
   });
+
+  document.getElementById("peopleBtn")?.addEventListener("click", () => {
+    showPeoplePanel = !showPeoplePanel;
+    if (showPeoplePanel) showRestorePanel = false;
+    render();
+  });
+
   document.getElementById("closeRestoreBtn")?.addEventListener("click", () => {
     showRestorePanel = false; render();
   });
@@ -616,13 +755,130 @@ function bindEvents() {
     el.addEventListener("click", () => restoreSnapshot(parseInt(el.dataset.id)));
   });
 
-  // Toggle phase
-  document.querySelectorAll(".toggle-phase").forEach(el => {
+  document.getElementById("closePeopleBtn")?.addEventListener("click", () => {
+    showPeoplePanel = false; render();
+  });
+
+  document.getElementById("newPersonName")?.addEventListener("input", (e) => { newPersonName = e.target.value; });
+  document.getElementById("newPersonEmail")?.addEventListener("input", (e) => { newPersonEmail = e.target.value; });
+  document.getElementById("addPersonBtn")?.addEventListener("click", addPerson);
+  document.getElementById("newPersonEmail")?.addEventListener("keydown", (e) => { if (e.key === "Enter") addPerson(); });
+
+  document.querySelectorAll(".remove-person-btn").forEach(el => {
     el.addEventListener("click", () => {
+      const pid = el.dataset.person;
+      if (!confirm("Remove this person?")) return;
+      const newPeople = (state.people || []).filter(p => p.id !== pid);
+      // clean assignments that point to removed person
+      const newAssignments = { ...(state.assignments || {}) };
+      for (const [itemId, a] of Object.entries(newAssignments)) {
+        if (a?.personId === pid) {
+          newAssignments[itemId] = { personId: "unassigned", name: "Unassigned", email: "" };
+        }
+      }
+      updateState({ people: newPeople, assignments: newAssignments });
+    });
+  });
+
+  // Phase collapse
+  document.querySelectorAll(".toggle-phase").forEach(el => {
+    el.addEventListener("click", (e) => {
+      // if clicking on buttons/inputs, ignore
+      const t = e.target;
+      if (t.closest(".phase-actions") || t.classList.contains("edit-phase-input")) return;
       const id = el.dataset.phase;
       collapsed[id] = !collapsed[id];
       render();
     });
+  });
+
+  // Phase edit/rename
+  document.querySelectorAll(".edit-phase-btn").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const id = el.dataset.phase;
+      editingPhase[id] = true;
+      editPhaseText[id] = state.phases.find(p => p.id === id)?.title || "";
+      render();
+      setTimeout(() => document.querySelector(`.edit-phase-input[data-phase="${id}"]`)?.focus(), 50);
+    });
+  });
+
+  document.querySelectorAll(".edit-phase-input").forEach(el => {
+    el.addEventListener("click", (e) => e.stopPropagation());
+    el.addEventListener("input", () => { editPhaseText[el.dataset.phase] = el.value; });
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter") savePhaseEdit(el.dataset.phase); });
+  });
+
+  document.querySelectorAll(".save-phase-btn").forEach(el => {
+    el.addEventListener("click", (e) => { e.stopPropagation(); savePhaseEdit(el.dataset.phase); });
+  });
+
+  document.querySelectorAll(".cancel-edit-phase-btn").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      editingPhase[el.dataset.phase] = false;
+      delete editPhaseText[el.dataset.phase];
+      render();
+    });
+  });
+
+  document.querySelectorAll(".delete-phase-btn").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (confirm("Delete this phase and all its items?")) {
+        const phaseId = el.dataset.phase;
+        const itemIds = (state.phases.find(p => p.id === phaseId)?.items || []).map(i => i.id);
+        const newPhases = state.phases.filter(p => p.id !== phaseId);
+
+        // clean related maps for those items
+        const newChecks = { ...state.checks };
+        const newNotes = { ...state.notes };
+        const newDocs = { ...state.docs };
+        const newAct = { ...state.activity };
+        const newUp = { ...state.uploads };
+        const newAssign = { ...(state.assignments || {}) };
+
+        for (const iid of itemIds) {
+          delete newChecks[iid];
+          delete newNotes[iid];
+          delete newDocs[iid];
+          delete newAct[iid];
+          delete newUp[iid];
+          delete newAssign[iid];
+        }
+
+        updateState({ phases: newPhases, checks: newChecks, notes: newNotes, docs: newDocs, activity: newAct, uploads: newUp, assignments: newAssign });
+      }
+    });
+  });
+
+  // Add phase
+  document.getElementById("startAddPhaseBtn")?.addEventListener("click", () => {
+    addingPhase = true; render();
+    setTimeout(() => document.getElementById("newPhaseInput")?.focus(), 50);
+  });
+  document.getElementById("newPhaseInput")?.addEventListener("input", (e) => { newPhaseText = e.target.value; });
+  document.getElementById("newPhaseInput")?.addEventListener("keydown", (e) => { if (e.key==="Enter") saveNewPhase(); });
+  document.getElementById("savePhaseBtn")?.addEventListener("click", saveNewPhase);
+  document.getElementById("cancelPhaseBtn")?.addEventListener("click", () => { addingPhase = false; newPhaseText = ""; render(); });
+
+  // Add item
+  document.querySelectorAll(".start-add-item").forEach(el => {
+    el.addEventListener("click", () => {
+      addingItem[el.dataset.phase] = true; render();
+      setTimeout(() => document.querySelector(`.new-item-input[data-phase="${el.dataset.phase}"]`)?.focus(), 50);
+    });
+  });
+  document.querySelectorAll(".new-item-input").forEach(el => {
+    el.addEventListener("input", () => { newItemTexts[el.dataset.phase] = el.value; });
+    el.addEventListener("keydown", (e) => { if (e.key==="Enter") saveNewItem(el.dataset.phase); });
+  });
+  document.querySelectorAll(".save-item-btn").forEach(el => {
+    el.addEventListener("click", () => saveNewItem(el.dataset.phase));
+  });
+  document.querySelectorAll(".cancel-item-btn").forEach(el => {
+    el.addEventListener("click", () => { addingItem[el.dataset.phase] = false; newItemTexts[el.dataset.phase] = ""; render(); });
   });
 
   // Toggle check
@@ -634,71 +890,30 @@ function bindEvents() {
       if (!newActivity[id]) newActivity[id] = [];
       if (newChecks[id]?.checked) {
         delete newChecks[id];
-        newActivity[id] = [{ action: "unchecked", by: userName, at: new Date().toISOString(), email: userEmail, uid: userUid }, ...newActivity[id]].slice(0, 20);
+        newActivity[id] = [{ action: "unchecked", by: userName, at: new Date().toISOString(), email: userEmail, uid: userUid }, ...newActivity[id]].slice(0, 50);
       } else {
         newChecks[id] = { checked: true, by: userName, at: new Date().toISOString(), email: userEmail, uid: userUid };
-        newActivity[id] = [{ action: "checked", by: userName, at: new Date().toISOString(), email: userEmail, uid: userUid }, ...newActivity[id]].slice(0, 20);
+        newActivity[id] = [{ action: "checked", by: userName, at: new Date().toISOString(), email: userEmail, uid: userUid }, ...newActivity[id]].slice(0, 50);
       }
       updateState({ checks: newChecks, activity: newActivity });
     });
   });
 
-  // Toggle history
-  document.querySelectorAll(".toggle-history-btn").forEach(el => {
-    el.addEventListener("click", () => {
-      const id = el.dataset.item;
-      expandedHistory[id] = !expandedHistory[id];
-      render();
-    });
-  });
-
-  // Toggle uploads
-  document.querySelectorAll(".toggle-uploads-btn").forEach(el => {
-    el.addEventListener("click", () => {
-      const id = el.dataset.item;
-      expandedUploads[id] = !expandedUploads[id];
-      render();
-    });
-  });
-
-  // File upload
-  document.querySelectorAll(".file-upload-input").forEach(el => {
-    el.addEventListener("change", () => {
-      const itemId = el.dataset.item;
-      const files = Array.from(el.files);
-      files.forEach(file => uploadFile(itemId, file));
-    });
-  });
-
-  // Remove upload
-  document.querySelectorAll(".remove-upload-btn").forEach(el => {
-    el.addEventListener("click", () => {
-      const itemId = el.dataset.item;
-      const idx = parseInt(el.dataset.idx);
-      const newUploads = { ...state.uploads, [itemId]: state.uploads[itemId].filter((_,i)=>i!==idx) };
-      updateState({ uploads: newUploads });
-    });
-  });
-
-  // Toggle notes
+  // Toggle sections
   document.querySelectorAll(".toggle-notes-btn").forEach(el => {
-    el.addEventListener("click", () => {
-      const id = el.dataset.item;
-      expandedNotes[id] = !expandedNotes[id];
-      render();
-    });
+    el.addEventListener("click", () => { const id = el.dataset.item; expandedNotes[id] = !expandedNotes[id]; render(); });
   });
-
-  // Toggle docs
   document.querySelectorAll(".toggle-docs-btn").forEach(el => {
-    el.addEventListener("click", () => {
-      const id = el.dataset.item;
-      expandedDocs[id] = !expandedDocs[id];
-      render();
-    });
+    el.addEventListener("click", () => { const id = el.dataset.item; expandedDocs[id] = !expandedDocs[id]; render(); });
+  });
+  document.querySelectorAll(".toggle-uploads-btn").forEach(el => {
+    el.addEventListener("click", () => { const id = el.dataset.item; expandedUploads[id] = !expandedUploads[id]; render(); });
+  });
+  document.querySelectorAll(".toggle-history-btn").forEach(el => {
+    el.addEventListener("click", () => { const id = el.dataset.item; expandedHistory[id] = !expandedHistory[id]; render(); });
   });
 
-  // Note inputs
+  // Notes
   document.querySelectorAll(".note-input").forEach(el => {
     el.addEventListener("input", () => { noteInputs[el.dataset.item] = el.value; });
     el.addEventListener("keydown", (e) => { if (e.key==="Enter") postNote(el.dataset.item); });
@@ -707,7 +922,7 @@ function bindEvents() {
     el.addEventListener("click", () => postNote(el.dataset.item));
   });
 
-  // Doc inputs
+  // Links
   document.querySelectorAll(".doc-label-input").forEach(el => {
     el.addEventListener("input", () => {
       if (!docInputs[el.dataset.item]) docInputs[el.dataset.item] = {};
@@ -724,88 +939,218 @@ function bindEvents() {
   document.querySelectorAll(".attach-doc-btn").forEach(el => {
     el.addEventListener("click", () => attachDoc(el.dataset.item));
   });
-  document.querySelectorAll(".doc-remove").forEach(el => {
+  document.querySelectorAll(".doc-remove-btn").forEach(el => {
     el.addEventListener("click", () => {
       const itemId = el.dataset.item;
       const idx = parseInt(el.dataset.idx);
-      const newDocs = { ...state.docs, [itemId]: state.docs[itemId].filter((_,i)=>i!==idx) };
+      const newDocs = { ...state.docs, [itemId]: (state.docs[itemId]||[]).filter((_,i)=>i!==idx) };
       updateState({ docs: newDocs });
     });
   });
 
-  // Add item
-  document.querySelectorAll(".start-add-item").forEach(el => {
+  // Files
+  document.querySelectorAll(".file-upload-input").forEach(el => {
+    el.addEventListener("change", () => {
+      const itemId = el.dataset.item;
+      const files = Array.from(el.files || []);
+      files.forEach(file => uploadFile(itemId, file));
+    });
+  });
+  document.querySelectorAll(".remove-upload-btn").forEach(el => {
     el.addEventListener("click", () => {
-      addingItem[el.dataset.phase] = true; render();
-      setTimeout(() => document.querySelector(`.new-item-input[data-phase="${el.dataset.phase}"]`)?.focus(), 50);
+      const itemId = el.dataset.item;
+      const idx = parseInt(el.dataset.idx);
+      const newUploads = { ...state.uploads, [itemId]: (state.uploads[itemId]||[]).filter((_,i)=>i!==idx) };
+      updateState({ uploads: newUploads });
     });
   });
-  document.querySelectorAll(".new-item-input").forEach(el => {
-    el.addEventListener("input", () => { newItemTexts[el.dataset.phase] = el.value; });
-    el.addEventListener("keydown", (e) => { if (e.key==="Enter") saveNewItem(el.dataset.phase); });
-  });
-  document.querySelectorAll(".save-item-btn").forEach(el => {
-    el.addEventListener("click", () => saveNewItem(el.dataset.phase));
-  });
 
-  // Add phase
-  document.getElementById("startAddPhaseBtn")?.addEventListener("click", () => {
-    addingPhase = true; render();
-    setTimeout(() => document.getElementById("newPhaseInput")?.focus(), 50);
-  });
-  document.getElementById("newPhaseInput")?.addEventListener("input", (e) => { newPhaseText = e.target.value; });
-  document.getElementById("newPhaseInput")?.addEventListener("keydown", (e) => { if (e.key==="Enter") saveNewPhase(); });
-  document.getElementById("savePhaseBtn")?.addEventListener("click", saveNewPhase);
-  document.getElementById("cancelPhaseBtn")?.addEventListener("click", () => { addingPhase = false; newPhaseText = ""; render(); });
-
-  // Edit phase
-  document.querySelectorAll(".edit-phase-btn").forEach(el => {
+  // Item edit
+  document.querySelectorAll(".edit-item-btn").forEach(el => {
     el.addEventListener("click", (e) => {
       e.stopPropagation();
-      const id = el.dataset.phase;
-      editingPhase[id] = true;
-      editPhaseText[id] = state.phases.find(p=>p.id===id)?.title || "";
+      const itemId = el.dataset.item;
+      editingItem[itemId] = true;
+      editItemText[itemId] = findItemText(itemId);
+      // keep assignment dropdown visible (render includes it only in edit mode)
       render();
-      setTimeout(() => document.querySelector(`.edit-phase-input[data-phase="${id}"]`)?.focus(), 50);
+      setTimeout(() => document.querySelector(`.edit-item-input[data-item="${itemId}"]`)?.focus(), 50);
     });
   });
-  document.querySelectorAll(".edit-phase-input").forEach(el => {
-    el.addEventListener("click", (e) => e.stopPropagation());
-    el.addEventListener("input", () => { editPhaseText[el.dataset.phase] = el.value; });
-    el.addEventListener("keydown", (e) => { if (e.key==="Enter") savePhaseEdit(el.dataset.phase); });
+
+  document.querySelectorAll(".edit-item-input").forEach(el => {
+    el.addEventListener("input", () => { editItemText[el.dataset.item] = el.value; });
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter") saveItemEdit(el.dataset.item); });
   });
-  document.querySelectorAll(".save-phase-btn").forEach(el => {
-    el.addEventListener("click", (e) => { e.stopPropagation(); savePhaseEdit(el.dataset.phase); });
+  document.querySelectorAll(".save-item-edit-btn").forEach(el => {
+    el.addEventListener("click", () => saveItemEdit(el.dataset.item));
   });
-  document.querySelectorAll(".cancel-edit-phase-btn").forEach(el => {
-    el.addEventListener("click", (e) => { e.stopPropagation(); editingPhase[el.dataset.phase] = false; render(); });
+  document.querySelectorAll(".cancel-item-edit-btn").forEach(el => {
+    el.addEventListener("click", () => {
+      const itemId = el.dataset.item;
+      delete editingItem[itemId];
+      delete editItemText[itemId];
+      render();
+    });
   });
 
-  // Delete phase
-  document.querySelectorAll(".delete-phase-btn").forEach(el => {
+  // Assignment quick button toggles edit mode + focuses dropdown
+  document.querySelectorAll(".assignee-btn").forEach(el => {
     el.addEventListener("click", (e) => {
       e.stopPropagation();
-      if (confirm("Delete this phase and all its items?")) {
-        const newPhases = state.phases.filter(p => p.id !== el.dataset.phase);
-        updateState({ phases: newPhases });
-      }
+      const itemId = el.dataset.item;
+      editingItem[itemId] = true;
+      editItemText[itemId] = editItemText[itemId] ?? findItemText(itemId);
+      render();
+      setTimeout(() => document.querySelector(`.assignee-select[data-item="${itemId}"]`)?.focus(), 50);
+    });
+  });
+
+  document.querySelectorAll(".assignee-select").forEach(el => {
+    el.addEventListener("change", () => {
+      const itemId = el.dataset.item;
+      const personId = el.value;
+      const person = (state.people || []).find(p => p.id === personId) || { id:"unassigned", name:"Unassigned", email:"" };
+      const newAssignments = { ...(state.assignments || {}) };
+      newAssignments[itemId] = { personId: person.id, name: person.name, email: person.email || "" };
+
+      // record activity
+      const newActivity = { ...state.activity };
+      if (!newActivity[itemId]) newActivity[itemId] = [];
+      newActivity[itemId] = [{ action: "assigned", by: userName, at: new Date().toISOString(), email: userEmail, uid: userUid, to: person.name }, ...newActivity[itemId]].slice(0, 50);
+
+      updateState({ assignments: newAssignments, activity: newActivity });
+    });
+  });
+
+  document.querySelectorAll(".manage-people-btn").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showPeoplePanel = true;
+      showRestorePanel = false;
+      render();
+      setTimeout(() => document.getElementById("newPersonName")?.focus(), 50);
+    });
+  });
+
+  // Delete item
+  document.querySelectorAll(".delete-item-btn").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const itemId = el.dataset.item;
+      const phaseId = el.dataset.phase;
+      if (!confirm("Delete this step?")) return;
+
+      const newPhases = state.phases.map(p => {
+        if (p.id !== phaseId) return p;
+        return { ...p, items: p.items.filter(i => i.id !== itemId) };
+      });
+
+      const newChecks = { ...state.checks }; delete newChecks[itemId];
+      const newNotes = { ...state.notes }; delete newNotes[itemId];
+      const newDocs  = { ...state.docs  }; delete newDocs[itemId];
+      const newAct   = { ...state.activity }; delete newAct[itemId];
+      const newUp    = { ...state.uploads }; delete newUp[itemId];
+      const newAssign = { ...(state.assignments || {}) }; delete newAssign[itemId];
+
+      updateState({ phases: newPhases, checks: newChecks, notes: newNotes, docs: newDocs, activity: newAct, uploads: newUp, assignments: newAssign });
+    });
+  });
+
+  // Drag & drop
+  document.querySelectorAll(".drag-handle").forEach(el => {
+    el.addEventListener("dragstart", (e) => {
+      const itemId = el.dataset.item;
+      const fromPhaseId = el.dataset.phase;
+      dragState = { itemId, fromPhaseId };
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", JSON.stringify(dragState));
+      // a tiny delay so the browser renders drag image
+      setTimeout(() => {
+        document.querySelectorAll(`.item[data-item-id="${CSS.escape(itemId)}"]`)?.forEach(n => n.classList.add("dragging"));
+      }, 0);
+    });
+    el.addEventListener("dragend", () => {
+      dragState = null;
+      document.querySelectorAll(".item").forEach(n => n.classList.remove("drag-over"));
+    });
+  });
+
+  document.querySelectorAll(".item").forEach(el => {
+    el.addEventListener("dragover", (e) => {
+      if (!dragState) return;
+      e.preventDefault();
+      el.classList.add("drag-over");
+      e.dataTransfer.dropEffect = "move";
+    });
+    el.addEventListener("dragleave", () => {
+      el.classList.remove("drag-over");
+    });
+    el.addEventListener("drop", (e) => {
+      if (!dragState) return;
+      e.preventDefault();
+      el.classList.remove("drag-over");
+
+      const targetItemId = el.dataset.itemId;
+      const targetPhaseId = el.dataset.phaseId;
+
+      const payload = safeParseDrag(e.dataTransfer.getData("text/plain")) || dragState;
+      if (!payload?.itemId || !payload?.fromPhaseId) return;
+
+      reorderOrMoveItem(payload.fromPhaseId, payload.itemId, targetPhaseId, targetItemId);
+    });
+  });
+
+  // Drop on phase area to move to end
+  document.querySelectorAll(".phase").forEach(phaseEl => {
+    phaseEl.addEventListener("dragover", (e) => {
+      if (!dragState) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+    });
+    phaseEl.addEventListener("drop", (e) => {
+      if (!dragState) return;
+      // only if dropping on empty area (not on an item)
+      if (e.target.closest(".item")) return;
+      e.preventDefault();
+      const targetPhaseId = phaseEl.dataset.phaseId;
+      const payload = safeParseDrag(e.dataTransfer.getData("text/plain")) || dragState;
+      if (!payload?.itemId || !payload?.fromPhaseId) return;
+      moveItemToEnd(payload.fromPhaseId, payload.itemId, targetPhaseId);
     });
   });
 }
 
-const PHASE_COLORS = ["#eef3ff","#e8f5f3","#fff4e8","#f0faf8","#fdf0f8","#f5f0ff","#fff8e8","#f0f8ff"];
-const PHASE_ICONS = ["🏢","🏥","💻","👥","📋","🏠","📊","🎯","📱","🔧"];
+function safeParseDrag(s) {
+  try { return JSON.parse(s); } catch { return null; }
+}
+
+function addPerson() {
+  const name = (newPersonName || "").trim();
+  const email = (newPersonEmail || "").trim();
+  if (!name) return;
+  const pid = genId("p");
+  const newPeople = [...(state.people || [{id:"unassigned",name:"Unassigned",email:""}])];
+  newPeople.push({ id: pid, name, email });
+
+  newPersonName = "";
+  newPersonEmail = "";
+
+  updateState({ people: newPeople });
+}
 
 function saveNewPhase() {
-  const text = newPhaseText.trim();
+  const text = (newPhaseText || "").trim();
   if (!text) return;
   const idx = state.phases.length;
+  const icons = ["🏢","🏥","💻","👥","📋","🏠","📊","🎯","📱","🔧"];
+  const colors = ["#eef3ff","#e8f5f3","#fff4e8","#f0faf8","#fdf0f8","#f5f0ff","#fff8e8","#f0f8ff"];
   const newPhase = {
-    id: genId(),
+    id: genId("phase"),
     title: text,
     subtitle: "Click ✏️ to rename this phase",
-    icon: PHASE_ICONS[idx % PHASE_ICONS.length],
-    color: PHASE_COLORS[idx % PHASE_COLORS.length],
+    icon: icons[idx % icons.length],
+    color: colors[idx % colors.length],
     items: []
   };
   newPhaseText = "";
@@ -817,8 +1162,57 @@ function savePhaseEdit(phaseId) {
   const text = (editPhaseText[phaseId] || "").trim();
   if (!text) return;
   const newPhases = state.phases.map(p => p.id===phaseId ? { ...p, title: text } : p);
-  editingPhase[phaseId] = false;
+  delete editingPhase[phaseId];
+  delete editPhaseText[phaseId];
   updateState({ phases: newPhases });
+}
+
+function saveNewItem(phaseId) {
+  const text = (newItemTexts[phaseId] || "").trim();
+  if (!text) return;
+  const newItem = { id: genId("item"), text };
+  const newPhases = state.phases.map(p => p.id===phaseId ? { ...p, items:[...p.items, newItem] } : p);
+  newItemTexts[phaseId] = "";
+  addingItem[phaseId] = false;
+  updateState({ phases: newPhases });
+}
+
+function saveItemEdit(itemId) {
+  const text = (editItemText[itemId] || "").trim();
+  if (!text) return;
+  const newPhases = state.phases.map(p => {
+    const idx = p.items.findIndex(i => i.id === itemId);
+    if (idx === -1) return p;
+    const items = [...p.items];
+    items[idx] = { ...items[idx], text };
+    return { ...p, items };
+  });
+
+  const newActivity = { ...state.activity };
+  if (!newActivity[itemId]) newActivity[itemId] = [];
+  newActivity[itemId] = [{ action: "edited", by: userName, at: new Date().toISOString(), email: userEmail, uid: userUid }, ...newActivity[itemId]].slice(0, 50);
+
+  delete editingItem[itemId];
+  delete editItemText[itemId];
+  updateState({ phases: newPhases, activity: newActivity });
+}
+
+function postNote(itemId) {
+  const text = (noteInputs[itemId] || "").trim();
+  if (!text) return;
+  const newNotes = { ...state.notes, [itemId]: [...(state.notes[itemId]||[]), { author: userName, text, at: new Date().toISOString(), email: userEmail, uid: userUid }] };
+  noteInputs[itemId] = "";
+  updateState({ notes: newNotes });
+}
+
+function attachDoc(itemId) {
+  const label = (docInputs[itemId]?.label || "").trim();
+  const url = (docInputs[itemId]?.url || "").trim();
+  if (!url) return;
+  const fullUrl = url.startsWith("http") ? url : "https://" + url;
+  const newDocs = { ...state.docs, [itemId]: [...(state.docs[itemId]||[]), { label: label||"Link", url: fullUrl, addedBy: userName, at: new Date().toISOString(), email: userEmail, uid: userUid }] };
+  docInputs[itemId] = { label: "", url: "" };
+  updateState({ docs: newDocs });
 }
 
 function uploadFile(itemId, file) {
@@ -826,6 +1220,7 @@ function uploadFile(itemId, file) {
   const uploadTask = window._uploadBytesResumable(storageRef, file);
   uploadProgress[itemId] = 0;
   render();
+
   uploadTask.on("state_changed",
     (snapshot) => {
       uploadProgress[itemId] = Math.round(snapshot.bytesTransferred / snapshot.totalBytes * 100);
@@ -846,44 +1241,49 @@ function uploadFile(itemId, file) {
   );
 }
 
-function postNote(itemId) {
-  const text = (noteInputs[itemId] || "").trim();
-  if (!text) return;
-  const newNotes = { ...state.notes, [itemId]: [...(state.notes[itemId]||[]), { author: userName, text, at: new Date().toISOString(), email: userEmail, uid: userUid }] };
-  noteInputs[itemId] = "";
-  updateState({ notes: newNotes });
+function reorderOrMoveItem(fromPhaseId, itemId, toPhaseId, beforeItemId) {
+  if (!fromPhaseId || !itemId || !toPhaseId) return;
+
+  // Build new phases immutably
+  const phases = state.phases.map(p => ({ ...p, items: [...p.items] }));
+
+  const fromPhase = phases.find(p => p.id === fromPhaseId);
+  const toPhase = phases.find(p => p.id === toPhaseId);
+  if (!fromPhase || !toPhase) return;
+
+  const fromIdx = fromPhase.items.findIndex(i => i.id === itemId);
+  if (fromIdx === -1) return;
+
+  const [moved] = fromPhase.items.splice(fromIdx, 1);
+
+  // If dropping "before" a specific item in the target phase
+  let insertIdx = toPhase.items.findIndex(i => i.id === beforeItemId);
+  if (insertIdx === -1) insertIdx = toPhase.items.length;
+  toPhase.items.splice(insertIdx, 0, moved);
+
+  updateState({ phases });
 }
 
-function attachDoc(itemId) {
-  const label = (docInputs[itemId]?.label || "").trim();
-  const url = (docInputs[itemId]?.url || "").trim();
-  if (!url) return;
-  const fullUrl = url.startsWith("http") ? url : "https://" + url;
-  const newDocs = { ...state.docs, [itemId]: [...(state.docs[itemId]||[]), { label: label||"Google Drive Document", url: fullUrl, addedBy: userName, at: new Date().toISOString(), email: userEmail, uid: userUid }] };
-  docInputs[itemId] = { label: "", url: "" };
-  updateState({ docs: newDocs });
-}
+function moveItemToEnd(fromPhaseId, itemId, toPhaseId) {
+  const phases = state.phases.map(p => ({ ...p, items: [...p.items] }));
+  const fromPhase = phases.find(p => p.id === fromPhaseId);
+  const toPhase = phases.find(p => p.id === toPhaseId);
+  if (!fromPhase || !toPhase) return;
 
-function saveNewItem(phaseId) {
-  const text = (newItemTexts[phaseId] || "").trim();
-  if (!text) return;
-  const newPhases = state.phases.map(p => p.id===phaseId ? { ...p, items:[...p.items,{id:genId(),text}] } : p);
-  newItemTexts[phaseId] = "";
-  addingItem[phaseId] = false;
-  updateState({ phases: newPhases });
+  const fromIdx = fromPhase.items.findIndex(i => i.id === itemId);
+  if (fromIdx === -1) return;
+  const [moved] = fromPhase.items.splice(fromIdx, 1);
+  toPhase.items.push(moved);
+
+  updateState({ phases });
 }
 
 // ── Boot ──
-function init() {	
+function init() {
   syncStatus = "connecting";
   render();
 
   window._onAuthStateChanged(window._auth, (user) => {
-if (user && !user.email.endsWith("@lighthousewellnessny.com")) {
-  alert("Access restricted to Lighthouse Wellness staff.");
-  window._signOut(window._auth);
-  return;
-}
     if (!user) {
       userName = "";
       userEmail = "";
@@ -898,7 +1298,6 @@ if (user && !user.email.endsWith("@lighthousewellnessny.com")) {
     userEmail = user.email || "";
     userName = user.displayName || user.email || "User";
 
-    // Subscribe once authenticated
     subscribeToFirebase();
     subscribeToSnapshots();
     render();
