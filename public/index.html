@@ -874,11 +874,16 @@ function saveNewItem(phaseId) {
 }
 
 // ── Boot ──
-function init() {
+function init() {	
   syncStatus = "connecting";
   render();
 
   window._onAuthStateChanged(window._auth, (user) => {
+if (user && !user.email.endsWith("@lighthousewellnessny.com")) {
+  alert("Access restricted to Lighthouse Wellness staff.");
+  window._signOut(window._auth);
+  return;
+}
     if (!user) {
       userName = "";
       userEmail = "";
