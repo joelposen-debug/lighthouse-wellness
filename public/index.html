@@ -11,6 +11,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBGKATmz498tN0MDeLrxlHyZZicwlSsIss",
@@ -24,7 +25,10 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const storage = getStorage(app);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
 
+  // expose for app script below
   window._db = db;
   window._doc = doc;
   window._getDoc = getDoc;
@@ -34,6 +38,13 @@
   window._ref = ref;
   window._uploadBytesResumable = uploadBytesResumable;
   window._getDownloadURL = getDownloadURL;
+
+  window._auth = auth;
+  window._provider = provider;
+  window._signInWithPopup = signInWithPopup;
+  window._signOut = signOut;
+  window._onAuthStateChanged = onAuthStateChanged;
+
   window._firebaseReady = true;
   window.dispatchEvent(new Event("firebaseReady"));
 </script>
@@ -42,16 +53,17 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: #f4f6f8; min-height: 100vh; }
 
-/* Name screen */
+/* Auth screen */
 .name-screen { min-height: 100vh; background: #0f2340; display: flex; align-items: center; justify-content: center; }
-.name-card { background: #fff; border-radius: 20px; padding: 48px 40px; max-width: 400px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.name-card { background: #fff; border-radius: 20px; padding: 48px 40px; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
 .name-card .logo { font-size: 52px; margin-bottom: 12px; }
 .name-card h1 { font-family: 'DM Serif Display', serif; font-size: 26px; color: #0f2340; font-weight: normal; margin-bottom: 8px; }
-.name-card p { font-size: 14px; color: #7a8c9e; margin-bottom: 28px; }
-.name-card input { width: 100%; padding: 12px 16px; border: 2px solid #dce4ec; border-radius: 10px; font-size: 15px; outline: none; margin-bottom: 14px; font-family: inherit; }
-.name-card input:focus { border-color: #1a7a6e; }
+.name-card p { font-size: 14px; color: #7a8c9e; margin-bottom: 22px; line-height: 1.5; }
 .name-card button { width: 100%; padding: 13px; background: #0f2340; color: #fff; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; font-family: inherit; transition: opacity 0.2s; }
 .name-card button:disabled { opacity: 0.4; }
+.small-link { margin-top: 14px; font-size: 12px; color: #7a8c9e; }
+.small-link a { color: #1a7a6e; text-decoration: none; }
+.small-link a:hover { text-decoration: underline; }
 
 /* Header */
 .header { background: #0f2340; padding: 24px 32px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
@@ -170,7 +182,7 @@ body { font-family: 'DM Sans', sans-serif; background: #f4f6f8; min-height: 100v
 <body>
 
 <div id="app">
-  <div class="loading-screen">⟳ Connecting to Firebase...</div>
+  <div class="loading-screen">⟳ Loading…</div>
 </div>
 
 <script type="module">
@@ -224,7 +236,10 @@ function fmt(iso) {
 }
 
 // ── State ──
-let userName = localStorage.getItem("lw_username") || "";
+let userName = "";
+let userEmail = "";
+let userUid = "";
+
 let state = { phases: INITIAL_PHASES, checks: {}, notes: {}, docs: {}, activity: {}, uploads: {} };
 let collapsed = {};
 let expandedNotes = {};
@@ -235,6 +250,7 @@ let docInputs = {};
 let newItemTexts = {};
 let syncStatus = "connecting";
 let unsubscribe = null;
+
 let addingPhase = false;
 let newPhaseText = "";
 let editingPhase = {};
@@ -341,24 +357,26 @@ function updateState(updates) {
 function render() {
   const app = document.getElementById("app");
 
-  if (!userName) {
+  // Auth gate
+  if (!userUid) {
     app.innerHTML = `
       <div class="name-screen">
         <div class="name-card">
           <div class="logo">🏠</div>
           <h1>Lighthouse Wellness</h1>
-          <p>Enter your name to collaborate with your team</p>
-          <input id="nameInput" type="text" placeholder="Your name..." autocomplete="off" />
-          <button id="nameBtn" disabled>Enter Checklist →</button>
+          <p>Sign in with Google to access the internal checklist.</p>
+          <button id="googleBtn">Sign in with Google</button>
+          <div class="small-link">Having trouble? Try a different Google account.</div>
         </div>
       </div>`;
-    const input = document.getElementById("nameInput");
-    const btn = document.getElementById("nameBtn");
-    input.addEventListener("input", () => { btn.disabled = !input.value.trim(); });
-    input.addEventListener("keydown", (e) => { if (e.key==="Enter" && input.value.trim()) submitName(input.value.trim()); });
-    btn.addEventListener("click", () => { if (input.value.trim()) submitName(input.value.trim()); });
-    input.focus();
-    return void 0;
+    document.getElementById("googleBtn").addEventListener("click", async () => {
+      try {
+        await window._signInWithPopup(window._auth, window._provider);
+      } catch (e) {
+        alert("Login failed: " + (e?.message || e));
+      }
+    });
+    return;
   }
 
   const totalItems = state.phases.reduce((s,p) => s + p.items.length, 0);
@@ -389,7 +407,7 @@ function render() {
           ${itemNotes.map(n => `
             <div class="note-item">
               <div class="note-author">${n.author} <span class="note-time">· ${fmt(n.at)}</span></div>
-              <div class="note-text">${n.text.replace(/</g,"&lt;")}</div>
+              <div class="note-text">${String(n.text).replace(/</g,"&lt;")}</div>
             </div>`).join("")}
           <div class="input-row">
             <input class="text-input note-input" data-item="${item.id}" placeholder="Add a note as ${userName}..." value="${(noteInputs[item.id]||"").replace(/"/g,"&quot;")}" />
@@ -404,8 +422,8 @@ function render() {
           ${itemDocs.map((doc,i) => `
             <div class="doc-item">
               <span>📄</span>
-              <a href="${doc.url}" target="_blank" rel="noopener noreferrer" class="doc-link">${doc.label.replace(/</g,"&lt;")}</a>
-              <span class="doc-meta">by ${doc.addedBy}</span>
+              <a href="${doc.url}" target="_blank" rel="noopener noreferrer" class="doc-link">${String(doc.label||"Google Drive Document").replace(/</g,"&lt;")}</a>
+              <span class="doc-meta">by ${doc.addedBy || "Unknown"}</span>
               <button class="doc-remove" data-item="${item.id}" data-idx="${i}">✕</button>
             </div>`).join("")}
           <div class="doc-inputs">
@@ -526,7 +544,7 @@ function render() {
         <div class="user-badge">👤 ${userName}</div>
         <div class="sync-status">${syncLabel}</div>
         <div class="header-btns">
-          <button class="header-btn" id="switchUserBtn">Switch User</button>
+          <button class="header-btn" id="logoutBtn">Logout</button>
           <button class="header-btn" id="saveVersionBtn">💾 Save Version</button>
           <button class="header-btn" id="restoreBtn">🕐 Restore</button>
         </div>
@@ -544,7 +562,7 @@ function render() {
           <div style="font-size:15px;font-weight:600;color:#0f2340;">🕐 Restore a Previous Version</div>
           <button id="closeRestoreBtn" style="background:none;border:none;color:#7a8c9e;cursor:pointer;font-size:18px;">✕</button>
         </div>
-        ${snapshots.length === 0 ? '<div style="font-size:13px;color:#7a8c9e;">No saved versions yet. Versions are saved automatically every time you make a change.</div>' : ""}
+        ${snapshots.length === 0 ? '<div style="font-size:13px;color:#7a8c9e;">No saved versions yet.</div>' : ""}
         ${snapshots.map(s => `
           <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #eef1f4;border-radius:10px;margin-bottom:8px;background:#fafbfc;">
             <div style="flex:1;">
@@ -556,6 +574,7 @@ function render() {
         <div style="font-size:11px;color:#7a8c9e;margin-top:8px;">⚠ Restoring will overwrite current data. A backup is saved automatically before restoring.</div>
       </div>
     </div>` : ""}
+
     <div class="phases">${phasesHTML}
       <div style="padding:8px 0">
         ${addingPhase ? `
@@ -573,9 +592,9 @@ function render() {
 }
 
 function bindEvents() {
-  // Switch user
-  document.getElementById("switchUserBtn")?.addEventListener("click", () => {
-    userName = ""; localStorage.removeItem("lw_username"); render();
+  // Logout
+  document.getElementById("logoutBtn")?.addEventListener("click", async () => {
+    try { await window._signOut(window._auth); } catch(e) {}
   });
 
   // Save version manually
@@ -615,10 +634,10 @@ function bindEvents() {
       if (!newActivity[id]) newActivity[id] = [];
       if (newChecks[id]?.checked) {
         delete newChecks[id];
-        newActivity[id] = [{ action: "unchecked", by: userName, at: new Date().toISOString() }, ...newActivity[id]].slice(0, 20);
+        newActivity[id] = [{ action: "unchecked", by: userName, at: new Date().toISOString(), email: userEmail, uid: userUid }, ...newActivity[id]].slice(0, 20);
       } else {
-        newChecks[id] = { checked: true, by: userName, at: new Date().toISOString() };
-        newActivity[id] = [{ action: "checked", by: userName, at: new Date().toISOString() }, ...newActivity[id]].slice(0, 20);
+        newChecks[id] = { checked: true, by: userName, at: new Date().toISOString(), email: userEmail, uid: userUid };
+        newActivity[id] = [{ action: "checked", by: userName, at: new Date().toISOString(), email: userEmail, uid: userUid }, ...newActivity[id]].slice(0, 20);
       }
       updateState({ checks: newChecks, activity: newActivity });
     });
@@ -684,7 +703,6 @@ function bindEvents() {
     el.addEventListener("input", () => { noteInputs[el.dataset.item] = el.value; });
     el.addEventListener("keydown", (e) => { if (e.key==="Enter") postNote(el.dataset.item); });
   });
-
   document.querySelectorAll(".post-note-btn").forEach(el => {
     el.addEventListener("click", () => postNote(el.dataset.item));
   });
@@ -696,7 +714,6 @@ function bindEvents() {
       docInputs[el.dataset.item].label = el.value;
     });
   });
-
   document.querySelectorAll(".doc-url-input").forEach(el => {
     el.addEventListener("input", () => {
       if (!docInputs[el.dataset.item]) docInputs[el.dataset.item] = {};
@@ -704,11 +721,9 @@ function bindEvents() {
     });
     el.addEventListener("keydown", (e) => { if (e.key==="Enter") attachDoc(el.dataset.item); });
   });
-
   document.querySelectorAll(".attach-doc-btn").forEach(el => {
     el.addEventListener("click", () => attachDoc(el.dataset.item));
   });
-
   document.querySelectorAll(".doc-remove").forEach(el => {
     el.addEventListener("click", () => {
       const itemId = el.dataset.item;
@@ -725,12 +740,10 @@ function bindEvents() {
       setTimeout(() => document.querySelector(`.new-item-input[data-phase="${el.dataset.phase}"]`)?.focus(), 50);
     });
   });
-
   document.querySelectorAll(".new-item-input").forEach(el => {
     el.addEventListener("input", () => { newItemTexts[el.dataset.phase] = el.value; });
     el.addEventListener("keydown", (e) => { if (e.key==="Enter") saveNewItem(el.dataset.phase); });
   });
-
   document.querySelectorAll(".save-item-btn").forEach(el => {
     el.addEventListener("click", () => saveNewItem(el.dataset.phase));
   });
@@ -756,17 +769,14 @@ function bindEvents() {
       setTimeout(() => document.querySelector(`.edit-phase-input[data-phase="${id}"]`)?.focus(), 50);
     });
   });
-
   document.querySelectorAll(".edit-phase-input").forEach(el => {
     el.addEventListener("click", (e) => e.stopPropagation());
     el.addEventListener("input", () => { editPhaseText[el.dataset.phase] = el.value; });
     el.addEventListener("keydown", (e) => { if (e.key==="Enter") savePhaseEdit(el.dataset.phase); });
   });
-
   document.querySelectorAll(".save-phase-btn").forEach(el => {
     el.addEventListener("click", (e) => { e.stopPropagation(); savePhaseEdit(el.dataset.phase); });
   });
-
   document.querySelectorAll(".cancel-edit-phase-btn").forEach(el => {
     el.addEventListener("click", (e) => { e.stopPropagation(); editingPhase[el.dataset.phase] = false; render(); });
   });
@@ -829,7 +839,7 @@ function uploadFile(itemId, file) {
     },
     async () => {
       const url = await window._getDownloadURL(uploadTask.snapshot.ref);
-      const newUploads = { ...state.uploads, [itemId]: [...(state.uploads[itemId]||[]), { name: file.name, url, uploadedBy: userName, at: new Date().toISOString() }] };
+      const newUploads = { ...state.uploads, [itemId]: [...(state.uploads[itemId]||[]), { name: file.name, url, uploadedBy: userName, at: new Date().toISOString(), email: userEmail, uid: userUid }] };
       delete uploadProgress[itemId];
       updateState({ uploads: newUploads });
     }
@@ -839,7 +849,7 @@ function uploadFile(itemId, file) {
 function postNote(itemId) {
   const text = (noteInputs[itemId] || "").trim();
   if (!text) return;
-  const newNotes = { ...state.notes, [itemId]: [...(state.notes[itemId]||[]), { author: userName, text, at: new Date().toISOString() }] };
+  const newNotes = { ...state.notes, [itemId]: [...(state.notes[itemId]||[]), { author: userName, text, at: new Date().toISOString(), email: userEmail, uid: userUid }] };
   noteInputs[itemId] = "";
   updateState({ notes: newNotes });
 }
@@ -849,7 +859,7 @@ function attachDoc(itemId) {
   const url = (docInputs[itemId]?.url || "").trim();
   if (!url) return;
   const fullUrl = url.startsWith("http") ? url : "https://" + url;
-  const newDocs = { ...state.docs, [itemId]: [...(state.docs[itemId]||[]), { label: label||"Google Drive Document", url: fullUrl, addedBy: userName, at: new Date().toISOString() }] };
+  const newDocs = { ...state.docs, [itemId]: [...(state.docs[itemId]||[]), { label: label||"Google Drive Document", url: fullUrl, addedBy: userName, at: new Date().toISOString(), email: userEmail, uid: userUid }] };
   docInputs[itemId] = { label: "", url: "" };
   updateState({ docs: newDocs });
 }
@@ -863,24 +873,35 @@ function saveNewItem(phaseId) {
   updateState({ phases: newPhases });
 }
 
-function submitName(name) {
-  userName = name;
-  localStorage.setItem("lw_username", name);
-  render();
-}
-
 // ── Boot ──
 function init() {
-  subscribeToFirebase();
-  subscribeToSnapshots();
+  syncStatus = "connecting";
   render();
+
+  window._onAuthStateChanged(window._auth, (user) => {
+    if (!user) {
+      userName = "";
+      userEmail = "";
+      userUid = "";
+      syncStatus = "connecting";
+      if (unsubscribe) { try { unsubscribe(); } catch(e) {} unsubscribe = null; }
+      render();
+      return;
+    }
+
+    userUid = user.uid;
+    userEmail = user.email || "";
+    userName = user.displayName || user.email || "User";
+
+    // Subscribe once authenticated
+    subscribeToFirebase();
+    subscribeToSnapshots();
+    render();
+  });
 }
 
-if (window._firebaseReady) {
-  init();
-} else {
-  window.addEventListener("firebaseReady", init);
-}
+if (window._firebaseReady) init();
+else window.addEventListener("firebaseReady", init);
 </script>
 </body>
 </html>
